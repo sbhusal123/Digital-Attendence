@@ -26,6 +26,7 @@ class Teacher(models.Model):
     phone_no = models.IntegerField()
     email = models.EmailField()
     pic_location = models.FileField()
+    username = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
@@ -36,6 +37,7 @@ class Student(models.Model):
     phone_no = models.IntegerField()
     email = models.EmailField()
     pic_location = models.FileField()
+    username = models.CharField(max_length=30)
 
     def __str__(self):
         return self.name
