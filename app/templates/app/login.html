@@ -81,7 +81,17 @@ input::-webkit-input-placeholder {
 
 	            </div>
 				<div class="main-login main-center">
-					<form class="form-horizontal" method="post" action="#">
+					<form class="form-horizontal" method="post">
+
+						{%if message%}
+						<div class="form-group ">
+							<div class="alert alert-warning">
+								<strong>{{message}}</strong>
+							</div>
+						</div>
+						{%endif%}
+
+						{%csrf_token%}
 
 
 						<div class="form-group">
@@ -107,17 +117,18 @@ input::-webkit-input-placeholder {
 
                         <div class="form-group">
                                 <label class="radio-inline">
-                                        <input type="radio" name="optradio" required>Student
+                                        <input type="radio" name="optradio" value="student" required>Student
                                 </label>
 
                                 <label class="radio-inline">
-                                    <input type="radio" name="optradio">Teacher
+                                    <input type="radio" name="optradio" value="teacher">Teacher
                                 </label>
                         </div>
 
                         <div class="form-group ">
 							<button type="submit" class="btn btn-primary btn-lg btn-block login-button">Login</button>
 						</div>
+
 
                         <p><strong>Not a user yet,</strong> <a href="{%url 'myapp:register'%}">Register</a></p>
 

@@ -1,0 +1,14 @@
+{%extends 'admin_base.html'%}
+
+{%block content%}
+    <!-- Preloader -->
+    <section id="wrapper" class="error-page">
+        <div class="error-box">
+            <div class="error-body text-center">
+                <h1 class="text-danger">404</h1>
+                <h3 class="text-uppercase">Access Forbidden</h3>
+                <a href="{%url 'myapp:index'%}" class="btn btn-danger btn-rounded waves-effect waves-light m-b-40">Back to home</a> </div>
+        </div>
+    </section>
+
+{%endblock%}
