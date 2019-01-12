@@ -1,5 +1,6 @@
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+import datetime
 
 class Department(models.Model):
 
@@ -47,10 +48,15 @@ class Student(models.Model):
 
 
 class Class(models.Model):
-    date = models.DateField()
-    time = models.TimeField()
+    date =  models.DateField(default=datetime.date.today)
+    time = models.TimeField(default=datetime.time)
     broadcast_attendance = models.BooleanField(default=False)
     t_id = models.ForeignKey(Teacher,on_delete=models.PROTECT)
+    dep_id = models.ForeignKey(Department,on_delete=models.PROTECT)
+    course_id = models.ForeignKey(Course,on_delete=models.PROTECT)
+
+
+
 
     def __str__(self):
         return str(self.date) + " at time "  + str(self.time)
@@ -78,6 +84,20 @@ class Enroll(models.Model):
     def __str__(self):
         return self.s.name + " enrolls in " + self.c.name
 
+
+class From(models.Model):
+    s = models.ForeignKey(Student, on_delete=models.PROTECT)
+    d = models.ForeignKey(Department,on_delete=models.PROTECT)
+
+    def __str__(self):
+        return str(self.s.name) + " is from " + str(self.d.name)
+
+class worksFor(models.Model):
+    t = models.ForeignKey(Teacher, on_delete=models.PROTECT)
+    d = models.ForeignKey(Department, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.t.name + " works for " +self.d.name
 
 class Attends(models.Model):
     cl_id = models.ForeignKey(Class,on_delete=models.CASCADE)

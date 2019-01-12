@@ -68,14 +68,51 @@
                 <div class="row">
                     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
                         <div class="white-box">
-                            <h3 class="box-title">Products Yearly Sales</h3>
-                            <ul class="list-inline text-right">
-                                <li>
-                                    <h5><i class="fa fa-circle m-r-5 text-info"></i>Mac</h5> </li>
-                                <li>
-                                    <h5><i class="fa fa-circle m-r-5 text-inverse"></i>Windows</h5> </li>
-                            </ul>
-                            <div id="ct-visits" style="height: 405px;"></div>
+                            <!--For student broadcast list here.-->
+
+                            {%if active_broadcast %}
+
+                            <div class="table-responsive">
+
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Time</th>
+                                            <th>Date</th>
+                                            <th>Course</th>
+                                            <th>Teacher</th>
+                                            <th>Action</th>
+                                            </tr>
+                                    </thead>
+                                <tbody>
+                                        <tr>
+                                                <td>{{active_broadcast.id}}</td>
+                                                <td>{{active_broadcast.time}}</td>
+                                                <td>{{active_broadcast.date}}</td>
+                                                <td>{{active_broadcast.course_id.name}}</td>
+                                                <td>{{active_broadcast.t_id.name}}</td>
+                                                <td>
+
+                                                <form method="post">
+                                                {%csrf_token%}
+                                                    <button class="btn btn-sm btn-danger glyphicon glyphicon-trash" ></button>
+                                                </form>
+
+
+
+                                                </td>
+                                        </tr>
+                                </tbody>
+                                </table>
+                            </div>
+
+
+
+                            {%endif%}
+
+                            {{errormsg}}
+
                         </div>
                     </div>
                 </div>

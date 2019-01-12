@@ -2,7 +2,6 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponseRedirect
 from .models import *
 from django.shortcuts import render_to_response
-from django.template import RequestContext
 
 
 # Create your views here.
@@ -64,20 +63,47 @@ def user_panel(request): #dashboard page
     type = request.session['type']
 
     if type == 'student':
-        return render(request,'admin_panel/student/index.html')
+        broadcast_set = broadcast_list(request.session['username'])
+        return render(request,'admin_panel/student/index.html',{'active_broadcast':broadcast_set})
 
     elif type == 'teacher':
-        broadcast_set =  active_broadcast(request.session['username'])
-        return render(request, 'admin_panel/teacher/index.html',{'active_broadcast':broadcast_set})
+        broadcast_set =  active_broadcast(request.session['username']) #fetching the active broadcasting done by teacher
+        dep = Department.objects.all()
+        course = Course.objects.all()
+        context = {'department': dep, 'course': course,'active_broadcast':broadcast_set}
+        return render(request, 'admin_panel/teacher/index.html',context)
 
 
-def active_broadcast(teacher_name):
+def active_broadcast(teacher_name): #for teachere
     broadcastingTeacher_id = Teacher.objects.get(username=teacher_name)
     try:
         cls = Class.objects.filter(t_id = broadcastingTeacher_id,broadcast_attendance=True)
         return cls
     except(Class.DoesNotExist):
        pass
+
+def broadcast_list(student_name): #for student
+    #condition are:
+    # teaher and student must be from same department
+    # teacher and student in same course
+    # broadcast_attendance = True in Class model
+    try:
+        active_broadcast = Class.objects.filter(broadcast_attendance=True)
+    except(Class.DoesNotExist):
+        return HttpResponseRedirect('/user_profile',{'errormsg':'No broadcasting Yet.'})
+    student_id = Student.objects.get(username=student_name).id #logged in student id
+    student_dep_id = From.objects.get(s = student_id).id
+
+    student_enrolled_course = Enroll.objects.filter(s = student_id)
+
+
+    for b in active_broadcast:
+        if b.dep_id.id == student_dep_id:
+            for course in student_enrolled_course:
+                if course.c.id == b.course_id.id:
+                    return b
+
+
 
 def broadcastDelete(request,id):
     if 'username' not in request.session:
@@ -95,12 +121,6 @@ def broadcastStop(request,id):
     c.save()
     return redirect('/user_panel')
     pass
-
-
-
-
-
-
 
 
 def basic_tables(request):
@@ -183,15 +203,24 @@ def register(request):
 
 def broadcastAttendance(request):
     if 'username' in request.session and request.session['type'] == 'teacher':
+        teacher_username = request.session['username']
+        bt_id = Teacher.objects.get(username=teacher_username)
         if request.method == 'POST':
-            teacher_username =  request.session['username']
-            bt_id = Teacher.objects.get(username=teacher_username)
-            b_date = request.POST['date']
-            b_time = request.POST['time']
-            Class.objects.create(t_id = bt_id,date=b_date,time = b_time,broadcast_attendance=True)
-            return redirect('/user_panel')
+
+            try:
+                b = Class.objects.get(broadcast_attendance=True,t_id=bt_id)
+                print('asd')
+                return HttpResponseRedirect('user_panel',{'msg':'Cannot broadcast more than one attendance.'})
+
+            except(Class.DoesNotExist):
+                dep_id = Department.objects.get(pk=request.POST['department'])
+                course_id = Course.objects.get(pk=request.POST['course'])
+                Class.objects.create(t_id = bt_id,broadcast_attendance=True,dep_id=dep_id,course_id=course_id)
+                return HttpResponseRedirect('user_panel',{'msg': 'Attendance broadcasted succesfully.'})
+
         else:
             return redirect('/user_panel')
 
     else:
+
         return redirect('/404Error')
