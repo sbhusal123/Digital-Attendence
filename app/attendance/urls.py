@@ -16,4 +16,5 @@ urlpatterns = [
     path('broadcast',views.broadcastAttendance,name="broadcast"),
     path('broadCastDelete/<int:id>',views.broadcastDelete,name="broadcastDelete"),
     path('broadCastStop/<int:id>',views.broadcastStop,name="broadcastStop"),
+    path('yesSir/<int:id>',views.yesSir,name='yesSir')
 ]

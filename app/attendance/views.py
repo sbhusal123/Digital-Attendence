@@ -87,21 +87,38 @@ def broadcast_list(student_name): #for student
     # teaher and student must be from same department
     # teacher and student in same course
     # broadcast_attendance = True in Class model
+    # attendance table doesn't consists of the pra class id.
     try:
-        active_broadcast = Class.objects.filter(broadcast_attendance=True)
+        active_broadcast = Class.objects.filter(broadcast_attendance=True) #filter list of active attendance
+
     except(Class.DoesNotExist):
         return HttpResponseRedirect('/user_profile',{'errormsg':'No broadcasting Yet.'})
+
     student_id = Student.objects.get(username=student_name).id #logged in student id
-    student_dep_id = From.objects.get(s = student_id).id
+
+
+
+    student_dep_id = From.objects.get(s = student_id).d.id #student from deptid
+
 
     student_enrolled_course = Enroll.objects.filter(s = student_id)
 
+    # surround with try catch here.
+    student_attended_class = Attends.objects.all()
 
     for b in active_broadcast:
         if b.dep_id.id == student_dep_id:
             for course in student_enrolled_course:
                 if course.c.id == b.course_id.id:
-                    return b
+                    # now i've got the way to extract which broadcast to display
+                    # to which student
+                    #now i need to check whether the such class_id exists in the attends class or not
+                    if Attends.objects.filter(cl_id = b.id,std_id = student_id).exists():
+                        pass
+                    else:
+                        return b
+
+
 
 
 
@@ -224,3 +241,9 @@ def broadcastAttendance(request):
     else:
 
         return redirect('/404Error')
+
+def yesSir(request,id):
+    std_id = Student.objects.get(username = request.session["username"])
+    cl_id = Class.objects.get(id=id)
+    Attends.objects.create(cl_id = cl_id,std_id=std_id)
+    return redirect('/user_panel')

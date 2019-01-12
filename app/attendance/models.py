@@ -101,7 +101,7 @@ class worksFor(models.Model):
 
 class Attends(models.Model):
     cl_id = models.ForeignKey(Class,on_delete=models.CASCADE)
-    date = models.DateField()
+    std_id = models.ForeignKey(Student,on_delete=models.PROTECT)
 
 
 
