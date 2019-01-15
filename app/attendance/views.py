@@ -1,20 +1,21 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponseRedirect
 from .models import *
-from django.shortcuts import render_to_response
+import datetime
+
 
 
 # Create your views here.
 
 def profile(request):
-    s_username = request.session['username']
-    type = request.session['type']
     context = ''
 
     #authentication
     if 'username' not in request.session:
         return redirect('/404Error')
     else:
+        s_username = request.session['username']
+        type = request.session['type']
         if type == 'teacher':
             context = Teacher.objects.filter(username=s_username)
 
@@ -64,7 +65,10 @@ def user_panel(request): #dashboard page
 
     if type == 'student':
         broadcast_set = broadcast_list(request.session['username'])
-        return render(request,'admin_panel/student/index.html',{'active_broadcast':broadcast_set})
+        today = datetime.date.today
+        student_tuple = Student.objects.get(username=request.session["username"])
+        ledger  = Attends.objects.filter(std_id = student_tuple)
+        return render(request,'admin_panel/student/index.html',{'active_broadcast':broadcast_set,'ledger':ledger,'today':today})
 
     elif type == 'teacher':
         broadcast_set =  active_broadcast(request.session['username']) #fetching the active broadcasting done by teacher
@@ -140,10 +144,28 @@ def broadcastStop(request,id):
     pass
 
 
-def basic_tables(request):
+def ledger(request):
     if 'username' not in request.session:
         return redirect('/404Error')
-    return render(request, 'admin_panel/basic-table.html')
+
+    if request.session["type"] == "student":
+        student_tuple = Student.objects.get(username=request.session["username"])
+        course = Enroll.objects.filter(s=student_tuple)
+        attended_class = Attends.objects.filter(std_id = student_tuple)
+
+        if request.method == 'POST':  # for filtering the records
+            date = request.POST["date"]
+            date =  datetime.datetime.strptime(date, "%b. %d, %Y").date()
+            course_filter = request.POST["course"]
+            return render(request, 'admin_panel/student/basic-table.html',
+                          {'attended_class': attended_class, 'course': course,'date_filter':date,'course_filter':course_filter})
+
+        else:
+            return render(request, 'admin_panel/student/basic-table.html',{'attended_class':attended_class,'course':course})
+
+    if request.session["type"] == "teacher":
+        return render(request, 'admin_panel/teacher/basic-table.html')
+
 
 def error(request):
     return render(request,'admin_panel/404.html')

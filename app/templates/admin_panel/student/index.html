@@ -120,52 +120,35 @@
                 <div class="row">
                     <div class="col-md-12 col-lg-12 col-sm-12">
                         <div class="white-box">
-                            <div class="col-md-3 col-sm-4 col-xs-6 pull-right">
-                                <select class="form-control pull-right row b-none">
-                                    <option>March 2017</option>
-                                    <option>April 2017</option>
-                                    <option>May 2017</option>
-                                    <option>June 2017</option>
-                                    <option>July 2017</option>
-                                </select>
-                            </div>
-                            <h3 class="box-title">Recent sales</h3>
+                            <h3 class="box-title">Today's Attendance</h3>
+
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>NAME</th>
-                                            <th>STATUS</th>
-                                            <th>DATE</th>
-                                            <th>PRICE</th>
+                                            <th>Course</th>
+                                            <th>Date</th>
+                                            <th>Instructor</th>
+                                            <th>Student</th>
                                         </tr>
                                     </thead>
                                     <tbody>
+                                    {%for class in ledger %}
+
+                                    {%if class.cl_id.date == today %}
                                         <tr>
-                                            <td>1</td>
-                                            <td class="txt-oflo">Elite admin</td>
-                                            <td>SALE</td>
-                                            <td class="txt-oflo">April 18, 2017</td>
-                                            <td><span class="text-success">$24</span></td>
+                                            <td>{{class.cl_id.course_id.name}}</td>
+                                            <td>{{class.cl_id.date}}</td>
+                                            <td>{{class.cl_id.t_id.name}}</td>
+                                            <td>{{class.std_id.name}}</td>
                                         </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td class="txt-oflo">Real Homes WP Theme</td>
-                                            <td>EXTENDED</td>
-                                            <td class="txt-oflo">April 19, 2017</td>
-                                            <td><span class="text-info">$1250</span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>3</td>
-                                            <td class="txt-oflo">Ample Admin</td>
-                                            <td>EXTENDED</td>
-                                            <td class="txt-oflo">April 19, 2017</td>
-                                            <td><span class="text-info">$1250</span></td>
-                                        </tr>
+                                    {%endif%}
+                                    {%endfor%}
                                     </tbody>
                                 </table>
                             </div>
+
+
                         </div>
                     </div>
                 </div>
