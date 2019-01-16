@@ -1,5 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponseRedirect
+from django.db.models import Q
 from .models import *
 import datetime
 
@@ -269,3 +270,20 @@ def yesSir(request,id):
     cl_id = Class.objects.get(id=id)
     Attends.objects.create(cl_id = cl_id,std_id=std_id)
     return redirect('/user_panel')
+
+def missingLectures(request):
+    if 'username' in request.session and request.session["type"] == "student":
+        course = Enroll.objects.filter(s__username__contains=request.session["username"])
+        missing = Attends.objects.filter(~Q(std_id__username__contains=request.session["username"]))
+
+        if request.method == 'POST':
+            course_filter = request.POST["course"]
+            print(course_filter)
+            return render(request,'admin_panel/student/blank.html',{'missing':missing,'course':course,'course_filter':course_filter})
+        else:
+            return render(request, 'admin_panel/student/blank.html',{'missing': missing, 'course': course})
+
+    elif 'username' in request.session and request.session["type"] == "teacher":
+        return render(request,'admin_panel/teacher/blank.html')
+    else:
+        return redirect('/404Error')
