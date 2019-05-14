@@ -79,6 +79,7 @@ def user_panel(request): #dashboard page
         return render(request, 'admin_panel/teacher/index.html',context)
 
 
+
 def active_broadcast(teacher_name): #for teachere
     broadcastingTeacher_id = Teacher.objects.get(username=teacher_name)
     try:
