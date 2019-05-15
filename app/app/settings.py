@@ -25,12 +25,13 @@ SECRET_KEY = '_j@aw+1#9su38=bc$y6#d)z22c+0$==a75jy)6-71drt6y*m^h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','10.42.0.1','127.0.0.1']
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'phonenumber_field',
     'attendance.apps.AttendanceConfig',
     'django.contrib.admin',
     'django.contrib.auth',

@@ -1,0 +1,75 @@
+{%extends 'admin_base.html'%}
+{% load static%}
+
+
+{%block content%}
+        {% include 'admin_panel/navigation_bar.html'%}
+        {% include 'admin_panel/side_navigation.html'%}
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Missing Lectures</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                            <li class="active">Missing Lectures</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="white-box">
+                            <div class="table-responsive">
+
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Date</th>
+                                            <th>Instructor</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                    {%for m in missing%}
+                                            {%if course_filter%}
+                                                {%if m.cl_id.course_id.name == course_filter%}
+                                                <tr>
+                                                    <td>{{m.cl_id.course_id.name}}</td>
+                                                    <td>{{m.cl_id.date}}</td>
+                                                    <td>{{m.cl_id.t_id.name}}</td>
+                                                </tr>
+                                                {%endif%}
+
+                                            {%else%}
+                                                <tr>
+                                                    <td>{{m.cl_id.course_id.name}}</td>
+                                                    <td>{{m.cl_id.date}}</td>
+                                                    <td>{{m.cl_id.t_id.name}}</td>
+                                                </tr>
+                                            {%endif%}
+                                    {%endfor%}
+                                    </tbody>
+                                </table>
+                                <form  method="post">
+                                    {%csrf_token%}
+                                        <button class="btn btn-primary">Filter</button>
+                                    <div class="col-md-3 col-sm-4 col-xs-6 pull-right">
+                                        <select class="form-control pull-right row b-none" name="course" >
+                                            {%for c in course%}
+                                            <option value="{{c.c.name}}">{{c.c.name}}</option>
+                                            {%endfor%}
+                                        </select>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+{%endblock%}

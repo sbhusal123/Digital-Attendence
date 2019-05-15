@@ -1,0 +1,95 @@
+{%extends 'admin_base.html'%}
+{% load static%}
+
+{%block content%}
+        {% include 'admin_panel/navigation_bar.html'%}
+        {% include 'admin_panel/side_navigation.html'%}
+        <!-- ============================================================== -->
+        <!-- Page Content -->
+        <!-- ============================================================== -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Ledger</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                            <li class="active">Ledger</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /row -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Attended Classes</h3>
+                            {%if date_filter and course_filter%}
+                            <strong>Filtering</strong> <span style="color:red"><i>Date</i>: {{date_filter}}</span> <span  style="color:green">    <i>Course:</i> {{course_filter}}</span>
+                            {%endif%}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Date</th>
+                                            <th>Instructor</th>
+                                            <th>Student</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            {%for class in attended_class%}
+                                            {%if date_filter and course_filter%}
+                                                {% if class.cl_id.date == date_filter and  class.cl_id.course_id.name == course_filter%}
+
+                                                        <tr>
+                                                            <td>{{class.cl_id.course_id.name}}</td>
+                                                            <td>{{class.cl_id.date}}</td>
+                                                            <td>{{class.cl_id.t_id.name}}</td>
+                                                            <td>{{class.std_id.name}}</td>
+                                                        </tr>
+                                                {%endif%}
+                                            {%else%}
+                                                        <tr>
+                                                            <td>{{class.cl_id.course_id.name}}</td>
+                                                            <td>{{class.cl_id.date}}</td>
+                                                            <td>{{class.cl_id.t_id.name}}</td>
+                                                            <td>{{class.std_id.name}}</td>
+                                                        </tr>
+                                            {%endif%}
+
+                                            {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <form  method="post">
+                            {%csrf_token%}
+                            <button class="btn btn-primary">Filter</button>
+                            <div class="col-md-3 col-sm-4 col-xs-6 pull-right">
+
+                                <select class="form-control pull-right row b-none" name="date">
+                                    {%for class in attended_class%}
+                                    <option value="{{class.cl_id.date}}">{{class.cl_id.date|date:"Y-m-d"}}</option>
+                                    {%endfor%}
+                                </select>
+
+                                 <select class="form-control pull-right row b-none" name="course" >
+                                     {%for c in course%}
+                                    <option value="{{c.c.name}}">{{c.c.name}}</option>
+                                     {%endfor%}
+                                </select>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+
+{%endblock%}

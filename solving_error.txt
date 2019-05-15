@@ -1,0 +1,7 @@
+if Mysql Serer doesnt starts then:
+
+service mysql stop
+
+To start
+
+service mysql start

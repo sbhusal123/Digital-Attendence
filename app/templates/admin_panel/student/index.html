@@ -1,0 +1,156 @@
+{%extends 'admin_base.html'%}
+{%load static%}
+
+{%block content%}
+
+
+        {% include 'admin_panel/navigation_bar.html'%}
+        {% include 'admin_panel/side_navigation.html'%}
+
+        <!-- ============================================================== -->
+        <!-- Page Content -->
+        <!-- ============================================================== -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Dashboard</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /.row -->
+                <!-- ============================================================== -->
+                <!-- Different data widgets -->
+                <!-- ============================================================== -->
+                <!-- .row -->
+                <div class="row">
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Visit</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-success"></i> <span class="counter text-success">659</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Total Page Views</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash2"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-purple"></i> <span class="counter text-purple">869</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-sm-6 col-xs-12">
+                        <div class="white-box analytics-info">
+                            <h3 class="box-title">Unique Visitor</h3>
+                            <ul class="list-inline two-part">
+                                <li>
+                                    <div id="sparklinedash3"></div>
+                                </li>
+                                <li class="text-right"><i class="ti-arrow-up text-info"></i> <span class="counter text-info">911</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--/.row -->
+                <!--row -->
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                        <div class="white-box">
+                            <!--For student broadcast list here.-->
+
+                            {%if active_broadcast %}
+
+                            <div class="table-responsive">
+
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Date</th>
+                                            <th>Course</th>
+                                            <th>Teacher</th>
+                                            <th>Action</th>
+                                            </tr>
+                                    </thead>
+                                <tbody>
+                                        <tr>
+                                                <td>{{active_broadcast.time}}</td>
+                                                <td>{{active_broadcast.date}}</td>
+                                                <td>{{active_broadcast.course_id.name}}</td>
+                                                <td>{{active_broadcast.t_id.name}}</td>
+                                                <td>
+
+                                                <form method="post" action="{%url 'myapp:yesSir'  id=active_broadcast.id %} ">
+                                                {%csrf_token%}
+                                                    <button class="btn btn-sm btn-primary glyphicon glyphicon-ok" ></button>
+                                                </form>
+
+
+
+                                                </td>
+                                        </tr>
+                                </tbody>
+                                </table>
+                            </div>
+
+                            {%else%}
+                            <!--Url to view the total attendance list-->
+                            <h4>No active broadcast, or you might have already  attended.</h4>
+
+                            {%endif%}
+
+                        </div>
+                    </div>
+                </div>
+                <!-- ============================================================== -->
+                <!-- table -->
+                <!-- ============================================================== -->
+                <div class="row">
+                    <div class="col-md-12 col-lg-12 col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Today's Attendance</h3>
+
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Course</th>
+                                            <th>Date</th>
+                                            <th>Instructor</th>
+                                            <th>Student</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {%for class in ledger %}
+
+                                    {%if class.cl_id.date == today %}
+                                        <tr>
+                                            <td>{{class.cl_id.course_id.name}}</td>
+                                            <td>{{class.cl_id.date}}</td>
+                                            <td>{{class.cl_id.t_id.name}}</td>
+                                            <td>{{class.std_id.name}}</td>
+                                        </tr>
+                                    {%endif%}
+                                    {%endfor%}
+                                    </tbody>
+                                </table>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+
+{%endblock%}
