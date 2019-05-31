@@ -65,11 +65,24 @@ def user_panel(request): #dashboard page
     type = request.session['type']
 
     if type == 'student':
-        broadcast_set = broadcast_list(request.session['username'])
-        today = datetime.date.today
-        student_tuple = Student.objects.get(username=request.session["username"])
-        ledger  = Attends.objects.filter(std_id = student_tuple)
-        return render(request,'admin_panel/student/index.html',{'active_broadcast':broadcast_set,'ledger':ledger,'today':today})
+        try:
+            '''
+            surrounded with try catch because the following code checks the database for
+            exietence of the some entity in the Class and Attends table.
+            
+            What if the system is fresh and runing for first time without the data on the tables
+            mentioned above.
+            '''
+            broadcast_set = broadcast_list(request.session['username'])
+            today = datetime.date.today
+            student_tuple = Student.objects.get(username=request.session["username"])
+            ledger  = Attends.objects.filter(std_id = student_tuple)
+            return render(request, 'admin_panel/student/index.html',
+                          {'active_broadcast': broadcast_set, 'ledger': ledger, 'today': today})
+        except:
+            return render(request, 'admin_panel/student/index.html')
+
+
 
     elif type == 'teacher':
         broadcast_set =  active_broadcast(request.session['username']) #fetching the active broadcasting done by teacher
@@ -93,7 +106,7 @@ def broadcast_list(student_name): #for student
     # teaher and student must be from same department
     # teacher and student in same course
     # broadcast_attendance = True in Class model
-    # attendance table doesn't consists of the pra class id.
+    # attendance table doesn't consists of the broadcasted class id.
     try:
         active_broadcast = Class.objects.filter(broadcast_attendance=True) #filter list of active attendance
 
