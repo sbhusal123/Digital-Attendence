@@ -2,6 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from .models import *
+from django.urls import reverse
 import datetime
 
 
@@ -200,7 +201,7 @@ def login(request):
             if Student.objects.filter(username = l_username,password = l_password).exists():
                 request.session['username'] = l_username
                 request.session['type'] = logfor
-                response = HttpResponseRedirect('/user_panel')
+                response = HttpResponseRedirect(reverse('myapp:user_panel'))#here,reverse is used to avoid hardcoded urls.
                 return response
             else:
                 message = 'Not a valid User. Enter Valid Details'
@@ -209,7 +210,7 @@ def login(request):
             if Teacher.objects.filter(username=l_username, password=l_password).exists():
                 request.session['username'] = l_username
                 request.session['type'] = logfor
-                response = HttpResponseRedirect('/user_panel')
+                response = HttpResponseRedirect(reverse('myapp:user_panel')) #here,reverse is used to avoid hardcoded urls.
                 return response
             else:
                 message = 'Not a valid User. Enter Valid Details'
