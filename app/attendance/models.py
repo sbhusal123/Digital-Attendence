@@ -51,15 +51,21 @@ class Class(models.Model):
     date =  models.DateField(default=datetime.date.today)
     time = models.TimeField(default=datetime.time)
     broadcast_attendance = models.BooleanField(default=False)
-    t_id = models.ForeignKey(Teacher,on_delete=models.PROTECT)
-    dep_id = models.ForeignKey(Department,on_delete=models.PROTECT)
-    course_id = models.ForeignKey(Course,on_delete=models.PROTECT)
+
 
 
 
 
     def __str__(self):
         return str(self.date) + " at time "  + str(self.time)
+
+class Associated(models.Model):
+    t_id = models.ForeignKey(Teacher, on_delete=models.PROTECT)
+    dep_id = models.ForeignKey(Department, on_delete=models.PROTECT)
+    course_id = models.ForeignKey(Course, on_delete=models.PROTECT)
+    # on_delete = models.PROTECT is used to protect the corresponding tuple from another entity in the relation
+    # from being deleted
+
 
 
 
