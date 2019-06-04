@@ -17,5 +17,13 @@ urlpatterns = [
     path('broadCastDelete/<int:id>', views.broadcastDelete,name="broadcastDelete"),
     path('broadCastStop/<int:id>', views.broadcastStop,name="broadcastStop"),
     path('yesSir/<int:id>', views.yesSir, name='yesSir'),
-    path('user_panel/missing_lectures', views.missingLectures,name='missing_lectures')
+    path('user_panel/missing_lectures', views.missingLectures,name='missing_lectures'),
+    path('department', views.departmentActions, name='department'),
+    path('department/teacher',views.TeacherListView.as_view(), name='teacher_list'),
+    path('department/teacher/<int:pk>',views.TeacherDetailView.as_view(), name='teacher_detail'),
+    path('department/student', views.StudentListView.as_view(), name='student_list'),
+    path('department/student/<int:pk>',views.StudentDetailView.as_view(), name='student_detail'),
+    path('department/course', views.CourseListView.as_view(), name='course_list'),
+    path('department/course/<int:pk>',views.CourseDetailView.as_view(), name='course_detail'),
+
 ]

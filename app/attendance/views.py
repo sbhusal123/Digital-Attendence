@@ -1,8 +1,14 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from .models import *
 from django.urls import reverse
+
+#new imports:
+from django.views.generic import (View,TemplateView,
+                                ListView,DetailView,
+                                CreateView, UpdateView,
+                                DeleteView)
 import datetime
 
 
@@ -302,3 +308,50 @@ def missingLectures(request):
         return render(request,'admin_panel/teacher/blank.html')
     else:
         return redirect('/404Error')
+
+
+def departmentActions(request):
+
+    if request.method == "POST":
+        l_username = request.POST['username']
+        l_password = request.POST['password']
+        if Department.objects.filter(name=l_username, password=l_password).exists():
+
+            return HttpResponseRedirect(reverse('myapp:teacher_list'))
+        else:
+            return HttpResponse("Invalid Input!!")
+
+    else:
+        return render(request,'app/department.html')
+
+
+
+class TeacherListView(ListView):
+    context_object_name = 'teachers'
+    model = Teacher
+
+
+
+class TeacherDetailView(DetailView):
+    context_object_name = 'teacher_detail'
+    model = Teacher
+    queryset = Teacher.objects.prefetch_related('course')
+    template_name = "attendance/teacher_detail.html"
+
+class StudentListView(ListView):
+    context_object_name = 'students'
+    model = Student
+
+class StudentDetailView(DetailView):
+    context_object_name = 'student_detail'
+    model = Student
+    template_name = "attendance/student_detail.html"
+
+class CourseListView(ListView):
+    context_object_name = 'courses'
+    model = Course
+
+class CourseDetailView(DetailView):
+    context_object_name = 'course_detail'
+    model = Course
+    template_name = "attendance/course_detail.html"
