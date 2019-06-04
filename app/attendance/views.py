@@ -1,8 +1,15 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from .models import *
 from django.urls import reverse
+import os
+
+#new imports:
+from django.views.generic import (View,TemplateView,
+                                ListView,DetailView,
+                                CreateView, UpdateView,
+                                DeleteView)
 import datetime
 
 
@@ -23,6 +30,8 @@ def profile(request):
 
         elif type == 'student':
             context = Student.objects.filter(username=s_username)
+        elif type == "department":
+            return HttpResponse("Department Profile is under construction.")
 
 
     #updating_fields
@@ -64,6 +73,8 @@ def user_panel(request): #dashboard page
         return redirect('/404Error')
 
     type = request.session['type']
+    os.system("clear")
+    print(request.session['type'])
 
     if type == 'student':
         try:
@@ -86,11 +97,18 @@ def user_panel(request): #dashboard page
 
 
     elif type == 'teacher':
-        broadcast_set =  active_broadcast(request.session['username']) #fetching the active broadcasting done by teacher
-        dep = Department.objects.all()
-        course = Course.objects.all()
-        context = {'department': dep, 'course': course,'active_broadcast':broadcast_set}
-        return render(request, 'admin_panel/teacher/index.html',context)
+        try:
+            broadcast_set =  active_broadcast(request.session['username']) #fetching the active broadcasting done by teacher
+            dep = Department.objects.all()
+            course = Course.objects.all()
+            context = {'department': dep, 'course': course,'active_broadcast':broadcast_set}
+            return render(request, 'admin_panel/teacher/index.html',context)
+        except:
+            return render(request, 'admin_panel/teacher/index.html')
+
+    elif type == "department":
+        return HttpResponse("Dashboard page is under construction.")
+
 
 
 
@@ -302,3 +320,57 @@ def missingLectures(request):
         return render(request,'admin_panel/teacher/blank.html')
     else:
         return redirect('/404Error')
+
+
+def departmentLogin(request):
+
+    if "type" in request.session and request.session["type"] == "department":
+        return HttpResponseRedirect(reverse('myapp:teacher_list'))
+
+    elif "type" not in request.session:
+        if request.method == "POST":
+            l_username = request.POST['username']
+            l_password = request.POST['password']
+            if Department.objects.filter(name=l_username, password=l_password).exists():
+                request.session["username"] = l_username #creates a session variable named dep_name to store which dep logged in
+                request.session['type'] = "department"
+                return HttpResponseRedirect(reverse('myapp:teacher_list'))
+            else:
+                return HttpResponse("Invalid Input!!")
+
+        else:
+            return render(request,'admin_panel/department/department_login.html') #as shown template file has been moved
+
+
+
+class TeacherListView(ListView):
+    context_object_name = 'teachers'
+    model = Teacher
+    template_name = "admin_panel/department/teacher_list.html"
+
+
+
+class TeacherDetailView(DetailView):
+    context_object_name = 'teacher_detail'
+    model = Teacher
+    template_name = "admin_panel/department/teacher_detail.html"
+
+class StudentListView(ListView):
+    context_object_name = 'students'
+    model = Student
+    template_name = "admin_panel/department/teacher_detail.html"
+
+class StudentDetailView(DetailView):
+    context_object_name = 'student_detail'
+    model = Student
+    template_name = "admin_panel/department/student_detail.html"
+
+class CourseListView(ListView):
+    context_object_name = 'courses'
+    model = Course
+    template_name = "admin_panel/department/course_detail.html"
+
+class CourseDetailView(DetailView):
+    context_object_name = 'course_detail'
+    model = Course
+    template_name = "admin_panel/department/course_detail.html"
