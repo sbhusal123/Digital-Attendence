@@ -47,7 +47,13 @@
                                             <td>{{students.name}}</td>
                                             <td>{{students.email}}</td>
                                             <td>{{students.phone_no}}</td>
-                                              <td><button type="button" class="btn btn-primary btn-xs"> <span class="glyphicon glyphicon-ok"></span></button></td>
+                                              <td>
+                                                  <form method="post" action="{%url 'myapp:approve_student'  student_id=students.id %} ">
+                                                      {% csrf_token %}
+                                                    <button type="submit" class="btn btn-primary btn-xs"> <span class="glyphicon glyphicon-ok"></span></button>
+                                                  </form>
+
+                                              </td>
                                           </tr>
                                         {%endfor%}
                                         </tbody>
@@ -65,19 +71,22 @@
                                             <th>Name</th>
                                             <th>Email</th>
                                             <th>Phone No</th>
+                                              <th>Remove</th>
                                           </tr>
                                         </thead>
                                         <tbody>
-                                          <tr>
-                                            <td>ExampleStudent</td>
-                                            <td>example@asd.asd</td>
-                                            <td>+97798123123</td>
-                                          </tr>
-                                          {%for student in students%}
+                                          {%for student in approved_student%}
                                          <tr>
-                                            <td>{{student.id}}}</td>
-                                            <td>example@asd.asd</td>
-                                            <td>+97798123123</td>
+                                            <td>{{student.s.name}}</td> <!-- needed url to redirect to detail view-->
+                                            <td>{{student.s.email}}</td>
+                                            <td>{{student.s.phone_no}}</td>
+                                             <td>
+                                             <form method="post" action="{%url 'myapp:remove_student'  student_id=student.s.id %} ">
+                                                      {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger btn-xs"> <span class="glyphicon glyphicon-trash"></span></button>
+                                                  </form>
+
+                                              </td>
                                           </tr>
                                         {%endfor%}
                                         </tbody>

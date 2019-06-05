@@ -93,7 +93,7 @@ class Enroll(models.Model):
 
 
 class From(models.Model):
-    s = models.ForeignKey(Student, on_delete=models.PROTECT)
+    s = models.ForeignKey(Student, on_delete=models.PROTECT,unique=True) #unique relation tuple shouldnt exist more than once
     d = models.ForeignKey(Department,on_delete=models.PROTECT)
 
     def __str__(self):

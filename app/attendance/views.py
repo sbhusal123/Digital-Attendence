@@ -344,6 +344,45 @@ def departmentLogin(request):
             return render(request,'admin_panel/department/department_login.html') #as shown template file has been moved
 
 
+def manage_student(request):
+    # pending_students context name to be passed
+
+    ps = PendingStudent()
+
+    context = {'pending_students':ps}
+
+    return render(request,'admin_panel/department/manage_student.html',context=context)
+
+
+def approveStudent(request,student_id):
+    logged_in_department =  request.session["username"]
+    currently_logged_in_department =  Department.objects.get(name = logged_in_department)
+    selected_student = Student.objects.get(pk = student_id)
+
+    From.objects.create(s=selected_student,d = currently_logged_in_department)
+    return redirect('/department/student') #need to pass message saying that student has been verified
+
+def removeStudent(request,student_id):
+    logged_in_department = request.session["username"]
+    currently_logged_in_department = Department.objects.get(name=logged_in_department)
+    selected_student = Student.objects.get(pk=student_id)
+    From.objects.get(s=selected_student,d = currently_logged_in_department).delete()
+    return redirect('/department/student')
+
+class ManageStudent(ListView):
+    # Students pending for department approval
+    model = Student
+    template_name = "admin_panel/department/manage_student.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(ManageStudent, self).get_context_data(*args, **kwargs)
+        logged_in_department_name = self.request.session["username"]
+
+        loged_in_dep_object = Department.objects.get(name = logged_in_department_name)
+        context['pending_students'] =  Student.objects.filter(from__d__isnull=True)
+        context['approved_student'] = From.objects.filter(d = loged_in_dep_object)
+        return context
+
 
 
 class TeacherListView(ListView): #Login required class list view
@@ -362,17 +401,6 @@ class TeacherDetailView(DetailView):
     template_name = "admin_panel/department/teacher_detail.html"
     #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
-class PendingStudent(ListView):
-    # Students pending for department approval
-    context_object_name = 'pending_students'
-    model = From
-    template_name = "admin_panel/department/student_detail.html"
-
-    def get_queryset(self):
-        return Student.objects.filter(from__d__isnull=True)
-
-
-
 
 
 class StudentEnrolledListView(ListView):
@@ -380,14 +408,15 @@ class StudentEnrolledListView(ListView):
     #  as the department name is stored in the session. Passing to the template and then comparing with dep name
     context_object_name = 'students'
     model = Student #from
-    template_name = "admin_panel/department/student_detail.html"
+    template_name = "admin_panel/department/manage_student.html"
 
 
 
 class StudentDetailView(DetailView):
+    # This is to show the students detail on click the student name in "department/student" in Students enrolled in current department
     context_object_name = 'student_detail'
     model = Student
-    template_name = "admin_panel/department/student_detail.html"
+    template_name = "admin_panel/department/manage_student.html"
     #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
 class CourseListView(ListView):

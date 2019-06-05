@@ -147,7 +147,7 @@
                                                 <td>{{b.course_id.name}}</td>
                                                 <td>
 
-                                                <form action="{%url 'myapp:broadcastDelete'  id=b.id %} " method="post">
+                                                <form action="{%url 'myapp:broadcastDelete'  id=b.id %} ">
                                                 {%csrf_token%}
                                                     <button class="btn btn-sm btn-danger glyphicon glyphicon-trash" ></button>
                                                 </form>
