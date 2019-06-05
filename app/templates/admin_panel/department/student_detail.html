@@ -7,7 +7,7 @@
 
 {%block content%}
         {% include 'admin_panel/navigation_bar.html'%}
-        {% include 'attendance/side_navigation.html'%}
+        {% include 'admin_panel/department/side_navigation.html'%}
         <!-- ============================================================== -->
         <!-- Page Content -->
         <!-- ============================================================== -->
@@ -29,13 +29,62 @@
                     <div class="col-sm-12">
                         <div class="white-box">
                             <!--#ADDED teachers list using ListView:CBV-->
-                            <div class="jumbotron">
-                                <h1>Welcome to the Student Detail Page</h1>
-                                <h2>Student details:</h2>
-                                <p>Name: {{ student_detail.name }}</p>
-                                <p>PhoneNumber: {{ student_detail.phone_no}}</p>
-                                <p>Email: {{ student_detail.email}}</p>
+
+                            <h2>Pending Students For Approval</h2>
+                            <div class="table-responsive" style="border: 2px solid teal;border-radius: 5px">
+                                <table class="table">
+                                        <thead>
+                                          <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone No</th>
+                                              <th>Approve</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {%for students in pending_students%}
+                                          <tr>
+                                            <td>{{students.name}}</td>
+                                            <td>{{students.email}}</td>
+                                            <td>{{students.phone_no}}</td>
+                                              <td><button type="button" class="btn btn-primary btn-xs"> <span class="glyphicon glyphicon-ok"></span></button></td>
+                                          </tr>
+                                        {%endfor%}
+                                        </tbody>
+                              </table>
+
+                            </div><br>
+                            <div class="alert alert-info">
+                                            <strong>Click on  button to approve request to current department.</strong>
+                                        </div>
+                            <h2>Students enrolled in current department</h2>
+                            <div class="table-responsive" style="border: 2px solid teal;border-radius: 5px">
+                                <table class="table">
+                                        <thead>
+                                          <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone No</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          <tr>
+                                            <td>ExampleStudent</td>
+                                            <td>example@asd.asd</td>
+                                            <td>+97798123123</td>
+                                          </tr>
+                                          {%for student in students%}
+                                         <tr>
+                                            <td>{{student.id}}}</td>
+                                            <td>example@asd.asd</td>
+                                            <td>+97798123123</td>
+                                          </tr>
+                                        {%endfor%}
+                                        </tbody>
+                              </table>
+
                             </div>
+                            <h3>Student can be directly manage by clicking the Student's name</h3>
 <!--                            <h3 class="box-title">Basic Table</h3>-->
 <!--                            <p class="text-muted">Add class <code>.table</code></p>-->
 <!--                            <div class="table-responsive">-->

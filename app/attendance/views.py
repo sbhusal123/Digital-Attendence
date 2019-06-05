@@ -5,12 +5,15 @@ from .models import *
 from django.urls import reverse
 import os
 
+
 #new imports:
 from django.views.generic import (View,TemplateView,
                                 ListView,DetailView,
                                 CreateView, UpdateView,
                                 DeleteView)
 import datetime
+
+from django.contrib.auth.mixins import LoginRequiredMixin #login required for class views
 
 
 
@@ -311,7 +314,6 @@ def missingLectures(request):
 
         if request.method == 'POST':
             course_filter = request.POST["course"]
-            print(course_filter)
             return render(request,'admin_panel/student/blank.html',{'missing':missing,'course':course,'course_filter':course_filter})
         else:
             return render(request, 'admin_panel/student/blank.html',{'missing': missing, 'course': course})
@@ -343,10 +345,14 @@ def departmentLogin(request):
 
 
 
-class TeacherListView(ListView):
+
+class TeacherListView(ListView): #Login required class list view
     context_object_name = 'teachers'
     model = Teacher
     template_name = "admin_panel/department/teacher_list.html"
+#     Security issue with the url. if url is directly provided acces is passed instead of foridding.
+
+
 
 
 
@@ -354,23 +360,44 @@ class TeacherDetailView(DetailView):
     context_object_name = 'teacher_detail'
     model = Teacher
     template_name = "admin_panel/department/teacher_detail.html"
+    #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
-class StudentListView(ListView):
+class PendingStudent(ListView):
+    # Students pending for department approval
+    context_object_name = 'pending_students'
+    model = From
+    template_name = "admin_panel/department/student_detail.html"
+
+    def get_queryset(self):
+        return Student.objects.filter(from__d__isnull=True)
+
+
+
+
+
+class StudentEnrolledListView(ListView):
+    # Students in the current department
+    #  as the department name is stored in the session. Passing to the template and then comparing with dep name
     context_object_name = 'students'
-    model = Student
-    template_name = "admin_panel/department/teacher_detail.html"
+    model = Student #from
+    template_name = "admin_panel/department/student_detail.html"
+
+
 
 class StudentDetailView(DetailView):
     context_object_name = 'student_detail'
     model = Student
     template_name = "admin_panel/department/student_detail.html"
+    #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
 class CourseListView(ListView):
     context_object_name = 'courses'
     model = Course
     template_name = "admin_panel/department/course_detail.html"
+    #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
 class CourseDetailView(DetailView):
     context_object_name = 'course_detail'
     model = Course
     template_name = "admin_panel/department/course_detail.html"
+    #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
