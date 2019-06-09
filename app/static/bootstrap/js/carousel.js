@@ -66,7 +66,7 @@
 
   Carousel.prototype.getItemIndex = function (item) {
     this.$items = item.parent().children('.item')
-    return this.$items.index(item || this.$active)
+    return this.$items.dashboard(item || this.$active)
   }
 
   Carousel.prototype.getItemForDirection = function (direction, active) {

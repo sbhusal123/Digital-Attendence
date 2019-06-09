@@ -2642,7 +2642,7 @@
 
     OldSelector.prototype.isHack = function(rule) {
       var before, i, index, len, ref, ref1, regexp, rules, some, string;
-      index = rule.parent.index(rule) + 1;
+      index = rule.parent.dashboard(rule) + 1;
       rules = rule.parent.nodes;
       while (index < rules.length) {
         before = rules[index].selector;
@@ -3164,7 +3164,7 @@
     Prefixes.prototype.group = function(decl) {
       var checker, index, length, rule, unprefixed;
       rule = decl.parent;
-      index = rule.index(decl);
+      index = rule.dashboard(decl);
       length = rule.nodes.length;
       unprefixed = this.unprefixed(decl.prop);
       checker = (function(_this) {
@@ -3593,7 +3593,7 @@
 
     Selector.prototype.already = function(rule, prefixeds, prefix) {
       var before, index, key, prefixed, some;
-      index = rule.parent.index(rule) - 1;
+      index = rule.parent.dashboard(rule) - 1;
       while (index >= 0) {
         before = rule.parent.nodes[index];
         if (before.type !== 'rule') {
@@ -15043,7 +15043,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
 var Container = _interopRequire(require("./container"));
 
-// CSS at-rule like “this.keyframes name { }”.
+// CSS at-rule like ï¿½this.keyframes name { }ï¿½.
 //
 // Can contain declarations (like this.font-face or this.page) ot another rules.
 
@@ -15819,7 +15819,7 @@ var vendor = _interopRequire(require("./vendor"));
 
 var Node = _interopRequire(require("./node"));
 
-// CSS declaration like “color: black” in rules
+// CSS declaration like ï¿½color: blackï¿½ in rules
 
 var Declaration = (function (Node) {
     function Declaration(defaults) {
@@ -16591,7 +16591,7 @@ var Node = (function () {
     //   }
 
     Node.prototype.next = function next() {
-        var index = this.parent.index(this);
+        var index = this.parent.dashboard(this);
         return this.parent.nodes[index + 1];
     };
 
@@ -16604,7 +16604,7 @@ var Node = (function () {
     //   }
 
     Node.prototype.prev = function prev() {
-        var index = this.parent.index(this);
+        var index = this.parent.dashboard(this);
         return this.parent.nodes[index - 1];
     };
 
@@ -17711,7 +17711,7 @@ var Root = (function (Container) {
     // Fix space when we remove first child
 
     Root.prototype.remove = function remove(child) {
-        child = this.index(child);
+        child = this.dashboard(child);
 
         if (child === 0 && this.nodes.length > 1) {
             this.nodes[1].before = this.nodes[child].before;
@@ -17791,7 +17791,7 @@ var Container = _interopRequire(require("./container"));
 
 var list = _interopRequire(require("./list"));
 
-// CSS rule like “a { }”
+// CSS rule like ï¿½a { }ï¿½
 
 var Rule = (function (Container) {
     function Rule(defaults) {

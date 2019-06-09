@@ -186,8 +186,8 @@ class Morris.DonutSegment extends Morris.EventEmitter
       @path, 
       @color, 
       @backgroundColor, 
-      => @fire('hover', @index),
-      => @fire('click', @index)
+      => @fire('hover', @dashboard),
+      => @fire('click', @dashboard)
     )
 
   drawDonutArc: (path, color) ->

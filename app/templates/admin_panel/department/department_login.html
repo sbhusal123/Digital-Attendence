@@ -74,7 +74,7 @@ input::-webkit-input-placeholder {
 
 {%block content%}
 
-
+{% include 'app/navigation_bar.html'%}
 
 
 		<div class="container" >
@@ -95,24 +95,7 @@ input::-webkit-input-placeholder {
 							<div class="cols-sm-10">
 								<div class="input-group">
 									<span class="input-group-addon"><i class="glyphicon glyphicon-certificate" aria-hidden="true"></i></span>
-                                    <select class="form-control" name="department" id="department"  placeholder="Select department" required>
-                                        <option selected>Choose...</option>
-                                        <option>BCT</option>
-                                        <option>BEX</option>
-                                        <option>BCE</option>
-
-                                    </select>
-								</div>
-							</div>
-						</div>
-
-
-						<div class="form-group">
-							<label for="username" class="cols-sm-2 control-label">Username</label>
-							<div class="cols-sm-10">
-								<div class="input-group">
-									<span class="input-group-addon"><i class="glyphicon glyphicon-user" aria-hidden="true"></i></span>
-									<input type="text" class="form-control" name="username" id="username"  placeholder="Enter your Username" required />
+									<input type="text" class="form-control" placeholder="Type a department name" name="username">
 								</div>
 							</div>
 						</div>
@@ -137,6 +120,11 @@ input::-webkit-input-placeholder {
 
 
 					</form>
+					{%if message%}
+					<div class="alert alert-danger form-group">
+						{{message}}
+					</div>
+					{%endif%}
 				</div>
 			</div>
 		</div>

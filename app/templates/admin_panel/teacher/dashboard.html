@@ -61,7 +61,7 @@
                             </ul>
                         </div>
                     </div>
-                </div>
+                </div>`
                 <!--/.row -->
                 <!--row -->
                 <!-- /.row -->
@@ -69,59 +69,68 @@
                     <div class="col-md-12 col-lg-12 col-sm-12 col-xs-12">
                         <div class="white-box" style="border:2px solid green;border-radius:5px">
 
-                         <form class="form-horizontal" method="post" action="{%url 'myapp:broadcast'%}">
-
-                             {%csrf_token%}
+                            {%if error_message%}
 
 
-                            <div class="alert alert-warning" style="border-radius:5px">
-                                <h4 align="center">Only one broadcast is available at a time.</h4>
+                            <div class="alert alert-warning">
+                                <p style="color: red"><b>{{error_message}}</b></p>
                             </div>
 
-                             <div class="form-group">
-							<label for="username" class="cols-sm-2 control-label">Department</label>
-							<div class="cols-sm-10">
-								<div class="input-group">
-									<!--Department-->
-                                     <select name="department">
-                                         {% for d in department %}
-                                            <option value="{{d.id}}">{{d.name}}</option>
-                                         {% endfor %}
-                                    </select>
-								</div>
-							</div>
-						</div>
-`
-                                <div class="form-group">
-							<label for="username" class="cols-sm-2 control-label">Course</label>
-							<div class="cols-sm-10">
-								<div class="input-group">
-                                    <select name="course">
-                                        {%for c in course%}
-                                            <option value="{{c.id}}">{{c.name}}</option>
-                                        {%endfor%}
-                                    </select>
-									<!--Subject id-->
-								</div>
-							</div>
-						</div>
 
-                             <div class="form-group">
+                            {%elif not error_message%}
 
-							<div class="cols-sm-10">
-								<div class="input-group">
-							        <button class="btn btn-danger btn-lg" type="submit">Broadcast</button>
-								</div>
-							</div>
-						</div>
+                                <form class="form-horizontal" method="post" action="{%url 'myapp:broadcast'%}">
 
-                         </form>
+                                            {%csrf_token%}
 
-                            {{msg}}
+
+                                            <div class="alert alert-info" style="border-radius:5px">
+                                                <h4 align="center">Only one broadcast is available at a time.</h4>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label for="username" class="cols-sm-2 control-label">Department</label>
+                                                <div class="cols-sm-10">
+                                                    <div class="input-group">
+                                                        <!--Department-->
+                                                            <select name="department_name">
+                                                                {% for objects in worksFor %}
+                                                                    <option value="{{objects.d.name}}">{{objects.d.name}}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+            `
+                                            <div class="form-group">
+                                                <label for="username" class="cols-sm-2 control-label">Course</label>
+                                                <div class="cols-sm-10">
+                                                    <div class="input-group">
+                                                            <select name="course_name">
+                                                                {%for objects in teaches%}
+                                                                    <option value="{{objects.c.name}}">{{objects.c.name}}</option>
+                                                                {%endfor%}
+                                                            </select>
+                                                        <!--Subject id-->
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                         <div class="form-group">
+                                            <div class="cols-sm-10">
+                                                <div class="input-group">
+                                                    <button class="btn btn-danger btn-lg" type="submit">Broadcast</button>
+                                                </div>
+                                            </div>
+                                         </div>
+
+                                     </form>
+
+                            {%endif%}
 
                           <div>
                                 <h2 align="center" style="border:2px solid pink">Active BroadCast List: Below</h2>
-                            </div>
+                          </div>
 
                             {%if active_broadcast%}
 
@@ -141,21 +150,21 @@
                                 <tbody>
                                             {%for b in active_broadcast%}
                                         <tr>
-                                                <td>{{b.time}}</td>
-                                                <td>{{b.date}}</td>
+                                                <td>{{b.class_id.time}}</td>
+                                                <td>{{b.class_id.date}}</td>
                                                 <td>{{b.dep_id.name}}</td>
                                                 <td>{{b.course_id.name}}</td>
                                                 <td>
 
-                                                <form action="{%url 'myapp:broadcastDelete'  id=b.id %} ">
-                                                {%csrf_token%}
-                                                    <button class="btn btn-sm btn-danger glyphicon glyphicon-trash" ></button>
-                                                </form>
+                                                    <form action="{%url 'myapp:broadcastDelete'  id=b.id %} ">
+                                                    {%csrf_token%}
+                                                        <button class="btn btn-sm btn-danger glyphicon glyphicon-trash" ></button>
+                                                    </form>
 
-                                                    <form action="{%url 'myapp:broadcastStop'  id=b.id %}" method="post">
-                                                {%csrf_token%}
-                                                    <button class="btn btn-sm btn-warning glyphicon glyphicon-stop" ></button>
-                                                </form>
+                                                    <form action="{%url 'myapp:broadcastStop'  id=b.class_id.id %}" method="post">
+                                                        {%csrf_token%}
+                                                        <button class="btn btn-sm btn-warning glyphicon glyphicon-stop" ></button>
+                                                    </form>
 
                                                 </td>
 
@@ -164,7 +173,17 @@
                                         </tr>
                                 </tbody>
                                 </table>
+
+                             {% else %}
+
+                             <div class="alert alert-warning" style="border-radius: 5px">
+                                 <h4 align="center">No active broadcast</h4>
+                             </div>
+
                              {%endif%}
+
+
+
                             </div>
                         </div>
 

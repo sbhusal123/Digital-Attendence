@@ -5,19 +5,18 @@ from . import views
 app_name = 'myapp'
 
 urlpatterns = [
-
     # please place the url accordingly
 
     # for students panel and teacher panel. Highly coupled code
     # required action for corresponding teacher/student is performed by checknig 'type' key in session
-    path('user_panel', views.user_panel,name='user_panel'),
-    path('user_panel/profile', views.profile,name='user_profile'),
+    path('user_panel', views.user_panel,name='user_panel'), #dashboard panel for student and teacher only
+    path('user_panel/profile', views.profile,name='user_profile'), #profile panel url for teacher and student only
     path('user_panel/ledger', views.ledger,name='basic_tables'), #shows the attendance leger for student and teacher
     path('login', views.login,name='login'), #login for student and teacher only
 
     # for teachers only. Related to attendance broadcast.
     # this broadcast delete and creating was for testing by hotspot creation as id demo in Hackathon.
-    # for future of this project out of scope. Needs modifiction
+    # for future of this project out of scope. Needs modifiction as this process will be replaced by the Teacher GUI applicaion.
     # only for teachers
     path('broadcast', views.broadcastAttendance,name="broadcast"),
     path('broadCastDelete/<int:id>', views.broadcastDelete,name="broadcastDelete"),

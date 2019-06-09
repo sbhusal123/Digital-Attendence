@@ -64,8 +64,12 @@ class Associated(models.Model):
     t_id = models.ForeignKey(Teacher, on_delete=models.PROTECT)
     dep_id = models.ForeignKey(Department, on_delete=models.PROTECT)
     course_id = models.ForeignKey(Course, on_delete=models.PROTECT)
+    class_id = models.ForeignKey(Class,on_delete=models.CASCADE,null=False)
     # on_delete = models.PROTECT is used to protect the corresponding tuple from another entity in the relation
     # from being deleted
+
+    def __str__(self):
+        return str(self.t_id) + " broadcasted " + str(self.course_id) + " course for " + str(self.dep_id) + " department."
 
 
 

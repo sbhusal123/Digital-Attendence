@@ -76,8 +76,6 @@ def user_panel(request): #dashboard page
         return redirect('/404Error')
 
     type = request.session['type']
-    os.system("clear")
-    print(request.session['type'])
 
     if type == 'student':
         try:
@@ -88,26 +86,48 @@ def user_panel(request): #dashboard page
             What if the system is fresh and runing for first time without the data on the tables
             mentioned above.
             '''
-            broadcast_set = broadcast_list(request.session['username'])
+            broadcast_set = broadcast_list(request.session['username'])  # active attendance broadcast fetched
             today = datetime.date.today
+
             student_tuple = Student.objects.get(username=request.session["username"])
-            ledger  = Attends.objects.filter(std_id = student_tuple)
-            return render(request, 'admin_panel/student/index.html',
-                          {'active_broadcast': broadcast_set, 'ledger': ledger, 'today': today})
+            # for today attended class. Context name = today_attended_class_detail, returns Associated objects
+            class_object_for_attended_class = Class.objects.filter(attends__std_id = student_tuple)
+
+            associated_object_for_attended_class = Associated.objects.filter(class_id__in = class_object_for_attended_class)
+
+
+
+
+            return render(request, 'admin_panel/student/dashboard.html',
+                          {'active_broadcast': broadcast_set, 'today_attended_class_detail': associated_object_for_attended_class, 'today': today})
         except:
-            return render(request, 'admin_panel/student/index.html')
+            return render(request, 'admin_panel/student/dashboard.html')
 
 
 
     elif type == 'teacher':
+        teacher_object = Teacher.objects.get(username=request.session['username'])
+        context = {}
         try:
-            broadcast_set =  active_broadcast(request.session['username']) #fetching the active broadcasting done by teacher
-            dep = Department.objects.all()
-            course = Course.objects.all()
-            context = {'department': dep, 'course': course,'active_broadcast':broadcast_set}
-            return render(request, 'admin_panel/teacher/index.html',context)
+            #placed inside try because if active broadcast doesn't exists then returns error.
+            broadcast_set =  active_broadcast(request.session['username'])  # fetching the active broadcasting done by teacher
+            context["active_broadcast"] = broadcast_set
         except:
-            return render(request, 'admin_panel/teacher/index.html')
+            context["no_active_broadcast"] = 'No active broadcast exists.'
+
+        if Teaches.objects.filter(t = teacher_object) and worksFor.objects.filter(t = teacher_object):
+
+            broadcasting_department_choice = worksFor.objects.filter(t = teacher_object) #checknig weather the teacher is assigned to department
+
+            broadcasing_course_choioce =  Teaches.objects.filter(t = teacher_object) #checking weather the teacher is assigned to course
+
+            context['worksFor'] = broadcasting_department_choice
+            context['teaches'] = broadcasing_course_choioce
+             #later edit
+            return render(request, 'admin_panel/teacher/dashboard.html',context)
+        else:
+            context ['error_message'] = "Please contact department administrator. You are not assigned to department or course"
+            return render(request, 'admin_panel/teacher/dashboard.html',context)
 
     elif type == "department":
         return HttpResponse("Dashboard page is under construction.")
@@ -118,56 +138,56 @@ def user_panel(request): #dashboard page
 def active_broadcast(teacher_name): #for teachere
     broadcastingTeacher_id = Teacher.objects.get(username=teacher_name)
     try:
-        cls = Class.objects.filter(t_id = broadcastingTeacher_id,broadcast_attendance=True)
+        cls = Associated.objects.filter(t_id = broadcastingTeacher_id,class_id__broadcast_attendance = True)
         return cls
     except(Class.DoesNotExist):
        pass
 
 def broadcast_list(student_name): #for student
+    # Returns the corresponding associated object for following suitable condition
+
     #condition are:
     # teaher and student must be from same department
     # teacher and student in same course
     # broadcast_attendance = True in Class model
     # attendance table doesn't consists of the broadcasted class id.
+
     try:
         active_broadcast = Class.objects.filter(broadcast_attendance=True) #filter list of active attendance
 
-    except(Class.DoesNotExist):
+    except:
         return HttpResponseRedirect('/user_profile',{'errormsg':'No broadcasting Yet.'})
 
-    student_id = Student.objects.get(username=student_name).id #logged in student id
+    student_id = Student.objects.get(username=student_name) #logged in student id
+    student_dep_id = From.objects.get(s = student_id).d #student from deptid
+    student_enrolled_course = Enroll.objects.filter(s = student_id) #student_enrolled courses
+    enrolled_course_list = []
+    for enroll in student_enrolled_course:
+        enrolled_course_list.append(enroll.c.name)
 
-
-
-    student_dep_id = From.objects.get(s = student_id).d.id #student from deptid
-
-
-    student_enrolled_course = Enroll.objects.filter(s = student_id)
 
     # surround with try catch here.
     student_attended_class = Attends.objects.all()
 
-    for b in active_broadcast:
-        if b.dep_id.id == student_dep_id:
-            for course in student_enrolled_course:
-                if course.c.id == b.course_id.id:
-                    # now i've got the way to extract which broadcast to display
-                    # to which student
-                    #now i need to check whether the such class_id exists in the attends class or not
-                    if Attends.objects.filter(cl_id = b.id,std_id = student_id).exists():
-                        pass
-                    else:
-                        return b
 
+    active_associated =  Associated.objects.filter(class_id__broadcast_attendance=True,dep_id = student_dep_id,
+                                                   course_id__name__in=enrolled_course_list)
 
-
+    for b in active_associated:
+        print(b.class_id.id)
+        if Attends.objects.filter(cl_id = b.class_id, std_id = student_id):
+            pass
+        else:
+            return b
 
 
 def broadcastDelete(request,id):
+    # remocing the class removes the objects from associated as well as class object
     if 'username' not in request.session:
         return redirect('/404Error')
-
-    Class.objects.get(id=id).delete()
+    associated_object = Associated.objects.get(id=id)
+    Associated.objects.get(id=id).delete() #remove the associated tuple
+    Class.objects.get(id = associated_object.class_id.id).delete() #remove the class tuple
     return redirect('/user_panel')
     pass
 
@@ -280,18 +300,22 @@ def register(request):
 def broadcastAttendance(request):
     if 'username' in request.session and request.session['type'] == 'teacher':
         teacher_username = request.session['username']
-        bt_id = Teacher.objects.get(username=teacher_username)
+        broadcasting_teacher_id = Teacher.objects.get(username=teacher_username)
         if request.method == 'POST':
+            if Associated.objects.filter(class_id__broadcast_attendance=True,t_id = broadcasting_teacher_id):
+                return HttpResponse("Cannot broadcast more than one attendance at a time.")
 
-            try:
-                b = Class.objects.get(broadcast_attendance=True,t_id=bt_id)
-                print('asd')
-                return HttpResponseRedirect('user_panel',{'msg':'Cannot broadcast more than one attendance.'})
+            else:
+                dep_id = Department.objects.get(name=request.POST['department_name'])
+                course_id = Course.objects.get(name=request.POST['course_name'])
+                # Class.objects.create(t_id = bt_id,broadcast_attendance=True,dep_id=dep_id,course_id=course_id)
 
-            except(Class.DoesNotExist):
-                dep_id = Department.objects.get(pk=request.POST['department'])
-                course_id = Course.objects.get(pk=request.POST['course'])
-                Class.objects.create(t_id = bt_id,broadcast_attendance=True,dep_id=dep_id,course_id=course_id)
+                broadcasted_class =  Class.objects.create(broadcast_attendance=True)
+
+                broadcasted_class.save()
+
+                Associated.objects.create(t_id = broadcasting_teacher_id,dep_id = dep_id,course_id = course_id,class_id = broadcasted_class)
+
                 return HttpResponseRedirect('user_panel',{'msg': 'Attendance broadcasted succesfully.'})
 
         else:
@@ -338,20 +362,13 @@ def departmentLogin(request):
                 request.session['type'] = "department"
                 return HttpResponseRedirect(reverse('myapp:teacher_list'))
             else:
-                return HttpResponse("Invalid Input!!")
+                return render(request, 'admin_panel/department/department_login.html', {'message':'Invalid password'})
 
         else:
-            return render(request,'admin_panel/department/department_login.html') #as shown template file has been moved
+            dep_list = Department.objects.all()
+            context = {'dep_list':dep_list}
+            return render(request,'admin_panel/department/department_login.html',context) #as shown template file has been moved
 
-
-def manage_student(request):
-    # pending_students context name to be passed
-
-    ps = PendingStudent()
-
-    context = {'pending_students':ps}
-
-    return render(request,'admin_panel/department/manage_student.html',context=context)
 
 
 def approveStudent(request,student_id):

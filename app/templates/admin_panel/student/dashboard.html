@@ -81,18 +81,21 @@
                                             <th>Date</th>
                                             <th>Course</th>
                                             <th>Teacher</th>
+                                            <th>Department</th>
                                             <th>Action</th>
                                             </tr>
                                     </thead>
                                 <tbody>
                                         <tr>
-                                                <td>{{active_broadcast.time}}</td>
-                                                <td>{{active_broadcast.date}}</td>
+                                                <td>{{active_broadcast.class_id.time}}</td>
+                                                <td>{{active_broadcast.class_id.date}}</td>
                                                 <td>{{active_broadcast.course_id.name}}</td>
                                                 <td>{{active_broadcast.t_id.name}}</td>
+                                                <td>{{active_broadcast.dep_id.name}}</td>
                                                 <td>
 
-                                                <form method="post" action="{%url 'myapp:yesSir'  id=active_broadcast.id %} ">
+
+                                                <form method="post" action="{%url 'myapp:yesSir'  id=active_broadcast.class_id.id %} ">
                                                 {%csrf_token%}
                                                     <button class="btn btn-sm btn-primary glyphicon glyphicon-ok" ></button>
                                                 </form>
@@ -100,6 +103,8 @@
 
 
                                                 </td>
+
+
                                         </tr>
                                 </tbody>
                                 </table>
@@ -129,20 +134,17 @@
                                             <th>Course</th>
                                             <th>Date</th>
                                             <th>Instructor</th>
-                                            <th>Student</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {%for class in ledger %}
+                                    {%for class in today_attended_class_detail %}
 
-                                    {%if class.cl_id.date == today %}
                                         <tr>
-                                            <td>{{class.cl_id.course_id.name}}</td>
-                                            <td>{{class.cl_id.date}}</td>
-                                            <td>{{class.cl_id.t_id.name}}</td>
-                                            <td>{{class.std_id.name}}</td>
+                                            <td>{{class.course_id.name}}</td>
+                                            <td>{{class.class_id.date}}</td>
+                                            <td>{{class.t_id.name}}</td>
                                         </tr>
-                                    {%endif%}
+
                                     {%endfor%}
                                     </tbody>
                                 </table>
