@@ -13,50 +13,55 @@ from django.views.generic import (View,TemplateView,
                                 DeleteView)
 import datetime
 
-from django.contrib.auth.mixins import LoginRequiredMixin #login required for class views
 
 
 
 # Create your views here.
 
-def profile(request):
-    context = ''
 
-    #authentication
-    if 'username' not in request.session:
+def student_profile(request):
+    if 'type' not in request.session or request.session['type'] != 'student':
         return redirect('/404Error')
-    else:
-        s_username = request.session['username']
-        type = request.session['type']
-        if type == 'teacher':
-            context = Teacher.objects.filter(username=s_username)
 
-        elif type == 'student':
-            context = Student.objects.filter(username=s_username)
-        elif type == "department":
-            return HttpResponse("Department Profile is under construction.")
+    s_username = request.session['username']
 
+    context = Student.objects.filter(username=s_username)
 
-    #updating_fields
     if request.method == 'POST':
-        model = ''
         u_email = request.POST['email']
         u_password = request.POST['password']
         u_phone = request.POST['phone']
-
-        if type == 'teacher':
-            model = Teacher.objects.get(username=s_username)
-
-        elif type == 'student':
-            model = Student.objects.get(username=s_username)
+        model = Student.objects.get(username=s_username)
 
         model.email = u_email
         model.password = u_password
         model.phone_no = u_phone
         model.save()
-        pass
+        return render(request, 'admin_panel/student/profile.html', {'details': context})
 
-    return render(request,'admin_panel/profile.html', {'details':context})
+    return render(request, 'admin_panel/student/profile.html', {'details': context})
+
+def teacher_profile(request):
+    if  'type' not in request.session or request.session['type'] != 'teacher':
+        return redirect('/404Error')
+
+    s_username = request.session['username']
+
+    context = Teacher.objects.filter(username=s_username)
+
+    if request.method == 'POST':
+        u_email = request.POST['email']
+        u_password = request.POST['password']
+        u_phone = request.POST['phone']
+        model = Teacher.objects.get(username=s_username)
+
+        model.email = u_email
+        model.password = u_password
+        model.phone_no = u_phone
+        model.save()
+        return render(request, 'admin_panel/teacher/profile.html', {'details': context})
+
+    return render(request, 'admin_panel/teacher/profile.html', {'details': context})
 
 def user_logout(request):
     if 'username' and 'type' in request.session:
@@ -70,67 +75,72 @@ def user_logout(request):
 def index(request):
     return render(request,'app/index.html')
 
-def user_panel(request): #dashboard page
 
-    if 'username' not in request.session:
-        return redirect('/404Error')
+def teacher_dashboard(request):
+    if request.session["type"] == "teacher":
 
-    type = request.session['type']
-
-    if type == 'student':
-        try:
-            '''
-            surrounded with try catch because the following code checks the database for
-            exietence of the some entity in the Class and Attends table.
-            
-            What if the system is fresh and runing for first time without the data on the tables
-            mentioned above.
-            '''
-            broadcast_set = broadcast_list(request.session['username'])  # active attendance broadcast fetched
-            today = datetime.date.today
-
-            student_tuple = Student.objects.get(username=request.session["username"])
-            # for today attended class. Context name = today_attended_class_detail, returns Associated objects
-            class_object_for_attended_class = Class.objects.filter(attends__std_id = student_tuple)
-
-            associated_object_for_attended_class = Associated.objects.filter(class_id__in = class_object_for_attended_class)
-
-
-
-
-            return render(request, 'admin_panel/student/dashboard.html',
-                          {'active_broadcast': broadcast_set, 'today_attended_class_detail': associated_object_for_attended_class, 'today': today})
-        except:
-            return render(request, 'admin_panel/student/dashboard.html')
-
-
-
-    elif type == 'teacher':
         teacher_object = Teacher.objects.get(username=request.session['username'])
         context = {}
         try:
-            #placed inside try because if active broadcast doesn't exists then returns error.
-            broadcast_set =  active_broadcast(request.session['username'])  # fetching the active broadcasting done by teacher
+            # placed inside try because if active broadcast doesn't exists then returns error.
+            broadcast_set = active_broadcast(
+                request.session['username'])  # fetching the active broadcasting done by teacher
             context["active_broadcast"] = broadcast_set
         except:
             context["no_active_broadcast"] = 'No active broadcast exists.'
 
-        if Teaches.objects.filter(t = teacher_object) and worksFor.objects.filter(t = teacher_object):
+        if Teaches.objects.filter(t=teacher_object) and worksFor.objects.filter(t=teacher_object):
 
-            broadcasting_department_choice = worksFor.objects.filter(t = teacher_object) #checknig weather the teacher is assigned to department
+            broadcasting_department_choice = worksFor.objects.filter(
+                t=teacher_object)  # checknig weather the teacher is assigned to department
 
-            broadcasing_course_choioce =  Teaches.objects.filter(t = teacher_object) #checking weather the teacher is assigned to course
+            broadcasing_course_choioce = Teaches.objects.filter(
+                t=teacher_object)  # checking weather the teacher is assigned to course
 
             context['worksFor'] = broadcasting_department_choice
             context['teaches'] = broadcasing_course_choioce
-             #later edit
-            return render(request, 'admin_panel/teacher/dashboard.html',context)
+            # later edit
+            return render(request, 'admin_panel/teacher/dashboard.html', context)
         else:
-            context ['error_message'] = "Please contact department administrator. You are not assigned to department or course"
-            return render(request, 'admin_panel/teacher/dashboard.html',context)
+            context[
+                'error_message'] = "Please contact department administrator. You are not assigned to department or course"
+            return render(request, 'admin_panel/teacher/dashboard.html', context)
+    else:
+        return HttpResponseRedirect("/404Error")
 
-    elif type == "department":
-        return HttpResponse("Dashboard page is under construction.")
+
+def student_dashboard(request):
+    if request.session['type'] != 'student':
+        return redirect('/404Error')
+
+    try:
+        '''
+        surrounded with try catch because the following code checks the database for
+        exietence of the some entity in the Class and Attends table.
+
+        What if the system is fresh and runing for first time without the data on the tables
+        mentioned above.
+        '''
+
+        broadcast_set = broadcast_list(request.session['username'])  # active attendance broadcast fetched
+        today = datetime.date.today
+
+        student_tuple = Student.objects.get(username=request.session["username"])
+
+        # for today attended class. Context name = today_attended_class_detail, returns Associated objects
+
+        class_object_for_attended_class = Class.objects.filter(attends__std_id=student_tuple)
+
+        associated_object_for_attended_class = Associated.objects.filter(class_id__in=class_object_for_attended_class)
+
+        return render(request, 'admin_panel/student/dashboard.html',
+                      {'active_broadcast': broadcast_set,
+                       'today_attended_class_detail': associated_object_for_attended_class, 'today': today})
+    except:
+        return render(request, 'admin_panel/student/dashboard.html')
+
+    return render(request, 'admin_panel/student/dashboard.html')
+
 
 
 
@@ -188,7 +198,7 @@ def broadcastDelete(request,id):
     associated_object = Associated.objects.get(id=id)
     Associated.objects.get(id=id).delete() #remove the associated tuple
     Class.objects.get(id = associated_object.class_id.id).delete() #remove the class tuple
-    return redirect('/user_panel')
+    return redirect('/teacher')
     pass
 
 def broadcastStop(request,id):
@@ -197,39 +207,44 @@ def broadcastStop(request,id):
     c = Class.objects.get(id=id)
     c.broadcast_attendance = False
     c.save()
-    return redirect('/user_panel')
+    return redirect('/teacher')
     pass
 
 
-def ledger(request):
-    if 'username' not in request.session:
+def teacher_ledger(request):
+    if 'username' not in request.session or request.session["type"] != 'teacher':
+        return redirect('/404Error')
+    return render(request, 'admin_panel/teacher/ledger.html')
+
+def student_ledger(request):
+    if 'type' not in request.session or request.session['type'] != 'student':
         return redirect('/404Error')
 
-    if request.session["type"] == "student":
-        student_tuple = Student.objects.get(username=request.session["username"])
-        course = Enroll.objects.filter(s=student_tuple)
-        attended_class = Attends.objects.filter(std_id = student_tuple)
+    student_tuple = Student.objects.get(username=request.session["username"])
+    course = Enroll.objects.filter(s=student_tuple)
+    attended_class = Attends.objects.filter(std_id=student_tuple)
 
-        if request.method == 'POST':  # for filtering the records
-            date = request.POST["date"]
-            date =  datetime.datetime.strptime(date, "%b. %d, %Y").date()
-            course_filter = request.POST["course"]
-            return render(request, 'admin_panel/student/basic-table.html',
-                          {'attended_class': attended_class, 'course': course,'date_filter':date,'course_filter':course_filter})
+    if request.method == 'POST':  # for filtering the records
+        date = request.POST["date"]
+        date = datetime.datetime.strptime(date, "%b. %d, %Y").date()
+        course_filter = request.POST["course"]
+        return render(request, 'admin_panel/student/basic-table.html',
+                      {'attended_class': attended_class, 'course': course, 'date_filter': date,
+                       'course_filter': course_filter})
 
-        else:
-            return render(request, 'admin_panel/student/basic-table.html',{'attended_class':attended_class,'course':course})
-
-    if request.session["type"] == "teacher":
-        return render(request, 'admin_panel/teacher/basic-table.html')
+    else:
+        return render(request, 'admin_panel/student/ledger.html', {'attended_class': attended_class, 'course': course})
 
 
 def error(request):
     return render(request,'admin_panel/404.html')
 
 def login(request):
-    if 'username' in request.session:
-        return redirect('/user_panel')
+    if 'username' in request.session and 'type' in request.session:
+        type = request.session["type"]
+
+        if type == "student":
+            return redirect('/student')
 
     if request.method == "POST":
         l_username = request.POST['username']
@@ -242,7 +257,7 @@ def login(request):
             if Student.objects.filter(username = l_username,password = l_password).exists():
                 request.session['username'] = l_username
                 request.session['type'] = logfor
-                response = HttpResponseRedirect(reverse('myapp:user_panel'))#here,reverse is used to avoid hardcoded urls.
+                response = HttpResponseRedirect(reverse('myapp:student_dashboard'))#here,reverse is used to avoid hardcoded urls.
                 return response
             else:
                 message = 'Not a valid User. Enter Valid Details'
@@ -251,7 +266,7 @@ def login(request):
             if Teacher.objects.filter(username=l_username, password=l_password).exists():
                 request.session['username'] = l_username
                 request.session['type'] = logfor
-                response = HttpResponseRedirect(reverse('myapp:user_panel')) #here,reverse is used to avoid hardcoded urls.
+                response = HttpResponseRedirect('teacher') #here,reverse is used to avoid hardcoded urls.
                 return response
             else:
                 message = 'Not a valid User. Enter Valid Details'
@@ -316,10 +331,10 @@ def broadcastAttendance(request):
 
                 Associated.objects.create(t_id = broadcasting_teacher_id,dep_id = dep_id,course_id = course_id,class_id = broadcasted_class)
 
-                return HttpResponseRedirect('user_panel',{'msg': 'Attendance broadcasted succesfully.'})
+                return HttpResponseRedirect('teacher',{'msg': 'Attendance broadcasted succesfully.'})
 
         else:
-            return redirect('/user_panel')
+            return redirect('/teacher')
 
     else:
 
@@ -329,29 +344,34 @@ def yesSir(request,id):
     std_id = Student.objects.get(username = request.session["username"])
     cl_id = Class.objects.get(id=id)
     Attends.objects.create(cl_id = cl_id,std_id=std_id)
-    return redirect('/user_panel')
+    return redirect('/student')
 
-def missingLectures(request):
-    if 'username' in request.session and request.session["type"] == "student":
-        course = Enroll.objects.filter(s__username__contains=request.session["username"])
-        missing = Attends.objects.filter(~Q(std_id__username__contains=request.session["username"]))
-
-        if request.method == 'POST':
-            course_filter = request.POST["course"]
-            return render(request,'admin_panel/student/blank.html',{'missing':missing,'course':course,'course_filter':course_filter})
-        else:
-            return render(request, 'admin_panel/student/blank.html',{'missing': missing, 'course': course})
-
-    elif 'username' in request.session and request.session["type"] == "teacher":
-        return render(request,'admin_panel/teacher/blank.html')
-    else:
+def student_missingLectures(request):
+    if 'type' not in request.session or request.session['type'] != "student":
         return redirect('/404Error')
+
+    course = Enroll.objects.filter(s__username__contains=request.session["username"])
+    missing = Attends.objects.filter(~Q(std_id__username__contains=request.session["username"]))
+    if request.method == 'POST':
+        course_filter = request.POST["course"]
+        return render(request, 'admin_panel/student/blank.html',
+                        {'missing': missing, 'course': course, 'course_filter': course_filter})
+    else:
+        return render(request, 'admin_panel/student/missing_lecture.html', {'missing': missing, 'course': course})
+
+
+def teacher_missingLectures(request):
+    if 'type' not in request.session or request.session['type'] != 'teacher':
+        return redirect('/404Error')
+
+    return render(request, 'admin_panel/teacher/missing_lecture.html')
 
 
 def departmentLogin(request):
 
-    if "type" in request.session and request.session["type"] == "department":
-        return HttpResponseRedirect(reverse('myapp:teacher_list'))
+    if 'type' in request.session and request.session['type'] == 'department':
+        return HttpResponseRedirect(reverse('myapp:teacher_list')) #url redirected after dep login
+
 
     elif "type" not in request.session:
         if request.method == "POST":
@@ -365,9 +385,12 @@ def departmentLogin(request):
                 return render(request, 'admin_panel/department/department_login.html', {'message':'Invalid password'})
 
         else:
-            dep_list = Department.objects.all()
-            context = {'dep_list':dep_list}
-            return render(request,'admin_panel/department/department_login.html',context) #as shown template file has been moved
+            return render(request,'admin_panel/department/department_login.html') #as shown template file has been moved
+
+    elif request.session["type"] != "department":
+        return redirect("/404Error")
+
+
 
 
 
@@ -406,8 +429,9 @@ class TeacherListView(ListView): #Login required class list view
     context_object_name = 'teachers'
     model = Teacher
     template_name = "admin_panel/department/teacher_list.html"
-#     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
+
+#     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
 
 

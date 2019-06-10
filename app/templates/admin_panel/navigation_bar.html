@@ -21,7 +21,15 @@
             <div class="navbar-header">
                 <div class="top-left-part">
                     <!-- Logo -->
-                    <a class="logo" href="{%url 'myapp:user_panel'%}">
+                    {%if request.session.type == 'teacher'%}
+                    <a class="logo" href="{%url 'myapp:teacher_dashboard'%}">
+
+                        {%elif request.session.type == 'student'%}
+                        <a class="logo" href="{%url 'myapp:student_dashboard'%}">
+
+                            {%else%}
+                            <a class="logo" href="{%url 'myapp:teacher_list'%}">
+                            {%endif%}
                         <!-- Logo icon image, you can use font-icon also --><b>
                         <!--This is dark logo icon--><img src="{% static 'admin_data/plugins/images/admin-logo.png' %}" alt="home" class="dark-logo" /><!--This is light logo icon--><img src="{% static '/plugins/images/admin-logo-dark.png' %}" alt="home" class="light-logo" />
                      </b>

@@ -5,14 +5,18 @@ from . import views
 app_name = 'myapp'
 
 urlpatterns = [
-    # please place the url accordingly
 
-    # for students panel and teacher panel. Highly coupled code
+    #coupled code for login.
     # required action for corresponding teacher/student is performed by checknig 'type' key in session
-    path('user_panel', views.user_panel,name='user_panel'), #dashboard panel for student and teacher only
-    path('user_panel/profile', views.profile,name='user_profile'), #profile panel url for teacher and student only
-    path('user_panel/ledger', views.ledger,name='basic_tables'), #shows the attendance leger for student and teacher
     path('login', views.login,name='login'), #login for student and teacher only
+
+
+    #teacher's url
+    path('teacher', views.teacher_dashboard,name='teacher_dashboard'), #dashboard panel for student and teacher only
+    path('teacher/profile', views.teacher_profile,name='teacher_profile'),
+    path('teacher/ledger', views.teacher_ledger,name='teacher_legder'),
+    path('teacher/missing_lectures', views.teacher_missingLectures,name='teacher_missing_lectures'),
+
 
     # for teachers only. Related to attendance broadcast.
     # this broadcast delete and creating was for testing by hotspot creation as id demo in Hackathon.
@@ -22,9 +26,14 @@ urlpatterns = [
     path('broadCastDelete/<int:id>', views.broadcastDelete,name="broadcastDelete"),
     path('broadCastStop/<int:id>', views.broadcastStop,name="broadcastStop"),
 
-    # for students
+    #student's panel
+    path('student', views.student_dashboard,name='student_dashboard'),
+    path('student/profile', views.student_profile,name='student_profile'),
+    path('student/ledger', views.student_ledger,name='student_ledger'),
+    path('student/missing_lectures', views.student_missingLectures,name='student_missing_lectures'),
+
+    #for student YesSir for broadcasted attendance
     path('yesSir/<int:id>', views.yesSir, name='yesSir'),
-    path('user_panel/missing_lectures', views.missingLectures,name='missing_lectures'),
 
     # Error page
     path('404Error', views.error),
@@ -33,12 +42,9 @@ urlpatterns = [
     path('', views.index,name='index'), #default url for application home page
     path('register', views.register,name='register'), #registered for student and teacher too, based on radio button value
 
-
     #logout for department/teacher/student.
     # just deleting the session key value
     path('logout', views.user_logout,name='logout'),
-
-
 
     # department related urls
     path('department', views.departmentLogin, name='department'), # this url is loaded before department login and form data is fetched and redirected as per need
