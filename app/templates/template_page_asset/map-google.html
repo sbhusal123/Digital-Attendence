@@ -84,7 +84,7 @@
                         <a href="index.html" class="waves-effect"><i class="fa fa-clock-o fa-fw" aria-hidden="true"></i>Dashboard</a>
                     </li>
                     <li>
-                        <a href="department/profile.html" class="waves-effect"><i class="fa fa-user fa-fw" aria-hidden="true"></i>Profile</a>
+                        <a href="../admin_panel/department/profile.html" class="waves-effect"><i class="fa fa-user fa-fw" aria-hidden="true"></i>Profile</a>
                     </li>
                     <li>
                         <a href="basic-table.html" class="waves-effect"><i class="fa fa-table fa-fw" aria-hidden="true"></i>Basic Table</a>
@@ -99,7 +99,7 @@
                         <a href="blank.html" class="waves-effect"><i class="fa fa-columns fa-fw" aria-hidden="true"></i>Blank Page</a>
                     </li>
                     <li>
-                        <a href="404.html" class="waves-effect"><i class="fa fa-info-circle fa-fw" aria-hidden="true"></i>Error 404</a>
+                        <a href="../app/404.html" class="waves-effect"><i class="fa fa-info-circle fa-fw" aria-hidden="true"></i>Error 404</a>
                     </li>
                 </ul>
                 <div class="center p-20">
@@ -117,29 +117,31 @@
             <div class="container-fluid">
                 <div class="row bg-title">
                     <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
-                        <h4 class="page-title">Blank Page</h4> </div>
+                        <h4 class="page-title">Google Map</h4> </div>
                     <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
                         <a href="https://wrappixel.com/templates/ampleadmin/" target="_blank" class="btn btn-danger pull-right m-l-20 hidden-xs hidden-sm waves-effect waves-light">Upgrade to Pro</a>
                         <ol class="breadcrumb">
                             <li><a href="#">Dashboard</a></li>
-                            <li class="active">Blank Page</li>
+                            <li class="active">Google Map</li>
                         </ol>
                     </div>
                     <!-- /.col-lg-12 -->
                 </div>
+                <!-- row -->
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-sm-12">
                         <div class="white-box">
-                            <h3 class="box-title">Blank Page</h3> </div>
+                            <h3 class="box-title">Simple Basic Map</h3>
+                            <div id="gmaps-simple" class="gmaps"></div>
+                        </div>
                     </div>
                 </div>
+                <!-- /.row -->
             </div>
             <!-- /.container-fluid -->
             <footer class="footer text-center"> 2017 &copy; Ample Admin brought to you by wrappixel.com </footer>
         </div>
-        <!-- ============================================================== -->
-        <!-- End Page Content -->
-        <!-- ============================================================== -->
+        <!-- /#page-wrapper -->
     </div>
     <!-- /#wrapper -->
     <!-- jQuery -->
@@ -154,6 +156,10 @@
     <script src="js/waves.js"></script>
     <!-- Custom Theme JavaScript -->
     <script src="js/custom.min.js"></script>
+    <!-- google maps api -->
+    <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
+    <script src="../plugins/bower_components/gmaps/gmaps.min.js"></script>
+    <script src="../plugins/bower_components/gmaps/jquery.gmaps.js"></script>
 </body>
 
 </html>

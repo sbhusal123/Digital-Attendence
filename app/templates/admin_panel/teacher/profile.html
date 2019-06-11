@@ -42,7 +42,7 @@ function mouseoutPass() {
                                 <div class="overlay-box" style=" background-image: linear-gradient(to right top, #d098b8, #be8cb6, #a882b3, #9078b1, #7370ad, #5a71ac, #3e71a9, #1871a2, #00779b, #117c91, #2c7f87, #43827e);">
                                     <div class="user-content">
                                         <a href="javascript:void(0)"><img src="{% static 'admin_data/plugins/images/users/genu.jpg' %}" class="thumb-lg img-circle" alt="img"></a>
-                                        {%for d in details%}
+                                        {%for d in general_details%}
                                         <h4 class="text-white">{{d.username}}</h4>
                                         <h5 class="text-white">{{d.email}}</h5> </div>
                                         {%endfor%}
@@ -67,7 +67,7 @@ function mouseoutPass() {
 
                                 {%csrf_token%}
 
-                                {%for d in details%}
+                                {%for d in general_details%}
 
                                 <div class="form-group">
                                     <label for="example-email" class="col-md-12">Email</label>
@@ -100,6 +100,48 @@ function mouseoutPass() {
                         </div>
                     </div>
                 </div>
+                <!--            End of general details div    -->
+
+
+                <!--           This row  is for displaying the department and course details     -->
+                <!--             For more info search bootstrap row column templating   -->
+                <div class="row">
+                     <div class="col-md-4 col-lg-7">
+                            <div class="white-box">
+                                <h2 align="center" style="background:#00CCFF;border: 2px solid green;border-radius: 3px">Department Details</h2>
+                                {%for d in enrolled_department_details%}
+
+                                <h3 align="center" style="color:indigo">Assigned: {{d.d.name}} </h3>
+                                <h3 align="center" style="color:indigo">Email: {{d.d.email}} </h3>
+                                <h3 align="center" style="color:indigo">Phone-no: {{d.d.phone_no}} </h3>
+
+                                {%endfor%}
+
+                                {%if no_enrolled_department%}
+                                    <h3 align="center" style="color:red">{{no_enrolled_department}} </h3>
+                                {%endif%}
+
+
+                            </div>
+                     </div>
+
+
+                    <div class="col-md-4 col-lg-5">
+                        <div class="white-box">
+                                <h2 align="center" style="background:#00CCFF;border: 2px solid green;border-radius: 3px">Courses Taught</h2>
+                                {%for d in enrolled_course_details%}
+                                    <h3 align="center">{{d.c.name}}</h3>
+                                {%endfor%}
+
+                                {%if no_enrolled_course%}
+                                    <h3 align="center" style="color:red">{{no_enrolled_course}} </h3>
+                                {%endif%}
+
+                            <p>Course details to be shown by clicking the course name. Feature!!!!</p>
+                        </div>
+                    </div>
+                </div>
+                <!--            End of advanced details row    -->
                 <!-- /.row -->
                 <div class="alert alert-info">
                     <h4 align="center">You are logged In as <span style="color:green"><i>{{request.session.type}}. </i></span> </h4>

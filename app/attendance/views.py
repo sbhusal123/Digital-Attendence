@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import Q
 from .models import *
 from django.urls import reverse
+from django.utils import timezone
 import os
 
 
@@ -25,21 +26,47 @@ def student_profile(request):
 
     s_username = request.session['username']
 
-    context = Student.objects.filter(username=s_username)
+    # Actually context is the dictionary data type in python.
+
+    context = {
+
+    }
+
+    # need to have try catch here. Because shows class DoesNotExists Error when student not assigned
+
+    general_details = Student.objects.filter(username=s_username)
+
+    context ["general_details"] = general_details #adding new object to the context
+
+    if From.objects.filter(s__name = s_username).exists():
+        enrolled_department_details = From.objects.filter(s__name = s_username)
+        context["enrolled_department_details"] = enrolled_department_details
+    else:
+        context["no_enrolled_department"] = "Not assigned to department. Please contact " \
+                                            "Department Admininstrator."
+
+    if Enroll.objects.filter(s__name = s_username).exists():
+        enrolled_course_details = Enroll.objects.filter(s__name = s_username)
+        context["enrolled_course_details"] = enrolled_course_details
+    else:
+        context["no_enrolled_course"] = "No enrolled courses found. Please contact " \
+                                        "Department Administrator."
 
     if request.method == 'POST':
         u_email = request.POST['email']
         u_password = request.POST['password']
         u_phone = request.POST['phone']
-        model = Student.objects.get(username=s_username)
 
+        #updating the student's general details on post request on profile page
+
+        model = Student.objects.get(username=s_username)
         model.email = u_email
         model.password = u_password
         model.phone_no = u_phone
         model.save()
-        return render(request, 'admin_panel/student/profile.html', {'details': context})
+        return render(request, 'admin_panel/student/profile.html',context)
 
-    return render(request, 'admin_panel/student/profile.html', {'details': context})
+    return render(request, 'admin_panel/student/profile.html',context)
 
 def teacher_profile(request):
     if  'type' not in request.session or request.session['type'] != 'teacher':
@@ -47,21 +74,46 @@ def teacher_profile(request):
 
     s_username = request.session['username']
 
-    context = Teacher.objects.filter(username=s_username)
+    context = {
+
+    }
+
+    general_details = Teacher.objects.filter(username=s_username)
+
+    context["general_details"] = general_details
+
+    if Teaches.objects.filter(t__username = s_username).exists():
+
+        enrolled_course_details = Teaches.objects.filter(t__username = s_username)
+
+        context["enrolled_course_details"] = enrolled_course_details
+
+    else:
+        context["no_enrolled_course"] = "Not assigned to course. " \
+                                        "Please contact department Administrator"
+
+    if worksFor.objects.filter(t__username = s_username).exists():
+        enrolled_department_details = worksFor.objects.filter(t__username = s_username)
+        context["enrolled_department_details"] = enrolled_department_details
+
+    else:
+        context["no_enrolled_department"] = "Not assigned to department. " \
+                                            "Please contact department Administrator"
 
     if request.method == 'POST':
         u_email = request.POST['email']
         u_password = request.POST['password']
         u_phone = request.POST['phone']
-        model = Teacher.objects.get(username=s_username)
 
+        #updating the teacher's details
+        model = Teacher.objects.get(username=s_username)
         model.email = u_email
         model.password = u_password
         model.phone_no = u_phone
         model.save()
-        return render(request, 'admin_panel/teacher/profile.html', {'details': context})
+        return render(request, 'admin_panel/teacher/profile.html', context)
 
-    return render(request, 'admin_panel/teacher/profile.html', {'details': context})
+    return render(request, 'admin_panel/teacher/profile.html', context)
 
 def user_logout(request):
     if 'username' and 'type' in request.session:
@@ -78,7 +130,6 @@ def index(request):
 
 def teacher_dashboard(request):
     if request.session["type"] == "teacher":
-
         teacher_object = Teacher.objects.get(username=request.session['username'])
         context = {}
         try:
@@ -220,24 +271,30 @@ def student_ledger(request):
     if 'type' not in request.session or request.session['type'] != 'student':
         return redirect('/404Error')
 
-    student_tuple = Student.objects.get(username=request.session["username"])
-    course = Enroll.objects.filter(s=student_tuple)
-    attended_class = Attends.objects.filter(std_id=student_tuple)
+    s_username = request.session["username"]
+
+    attends_object = Attends.objects.filter(std_id__username = s_username)
+    attended_class_object = []
+    for objects in attends_object:
+        attended_class_object.append(objects.cl_id)  # holds the classes objects which student has attended
+    attended_classes_info = Associated.objects.filter(class_id__in = attended_class_object)
+
+    courses_enrolled = Enroll.objects.filter(s__username = s_username)
+    context = {
+        "attended_classes_info": attended_classes_info,
+        "courses_enrolled": courses_enrolled
+    }
 
     if request.method == 'POST':  # for filtering the records
-        date = request.POST["date"]
-        date = datetime.datetime.strptime(date, "%b. %d, %Y").date()
-        course_filter = request.POST["course"]
-        return render(request, 'admin_panel/student/basic-table.html',
-                      {'attended_class': attended_class, 'course': course, 'date_filter': date,
-                       'course_filter': course_filter})
-
+        course_filter = request.POST["course_filter"]
+        context["course_filter"] = course_filter
+        return render(request, 'admin_panel/student/ledger.html',context)
     else:
-        return render(request, 'admin_panel/student/ledger.html', {'attended_class': attended_class, 'course': course})
+        return render(request, 'admin_panel/student/ledger.html',context)
 
 
 def error(request):
-    return render(request,'admin_panel/404.html')
+    return render(request,'app/404.html')
 
 def login(request):
     if 'username' in request.session and 'type' in request.session:
@@ -325,7 +382,10 @@ def broadcastAttendance(request):
                 course_id = Course.objects.get(name=request.POST['course_name'])
                 # Class.objects.create(t_id = bt_id,broadcast_attendance=True,dep_id=dep_id,course_id=course_id)
 
-                broadcasted_class =  Class.objects.create(broadcast_attendance=True)
+                # get the local time zone as per the zone defined in settings.py
+                time =  timezone.localtime(timezone.now())
+                broadcasted_class =  Class.objects.create(broadcast_attendance=True,time = time)
+
 
                 broadcasted_class.save()
 

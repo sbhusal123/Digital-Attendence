@@ -23,66 +23,61 @@
                 <!-- /row -->
                 <div class="row">
                     <div class="col-sm-12">
+                        {%if course_filter%}
+                        <h2>Currently filtering:<i> {{course_filter}}</i></h2>
+                        {%endif%}
                         <div class="white-box">
                             <h3 class="box-title">Attended Classes</h3>
-                            {%if date_filter and course_filter%}
-                            <strong>Filtering</strong> <span style="color:red"><i>Date</i>: {{date_filter}}</span> <span  style="color:green">    <i>Course:</i> {{course_filter}}</span>
-                            {%endif%}
                             <div class="table-responsive">
                                 <table class="table">
                                     <thead>
                                         <tr>
                                             <th>Course</th>
                                             <th>Date</th>
+                                            <th>Time</th>
                                             <th>Instructor</th>
-                                            <th>Student</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                            {%for class in attended_class%}
-                                            {%if date_filter and course_filter%}
-                                                {% if class.cl_id.date == date_filter and  class.cl_id.course_id.name == course_filter%}
+                                    {%for object in attended_classes_info%}
 
-                                                        <tr>
-                                                            <td>{{class.cl_id.course_id.name}}</td>
-                                                            <td>{{class.cl_id.date}}</td>
-                                                            <td>{{class.cl_id.t_id.name}}</td>
-                                                            <td>{{class.std_id.name}}</td>
-                                                        </tr>
-                                                {%endif%}
-                                            {%else%}
-                                                        <tr>
-                                                            <td>{{class.cl_id.course_id.name}}</td>
-                                                            <td>{{class.cl_id.date}}</td>
-                                                            <td>{{class.cl_id.t_id.name}}</td>
-                                                            <td>{{class.std_id.name}}</td>
-                                                        </tr>
-                                            {%endif%}
+                                    {%if course_filter%}
+                                        {%if object.course_id.name == course_filter%}
+                                            <tr>
+                                                <td>{{object.course_id.name}}</td>
+                                                <td>{{object.class_id.date}}</td>
+                                                <td>{{object.class_id.time}}</td>
+                                                <td>{{object.t_id.name}}</td>
+                                            </tr>
+                                        {%endif%}
+                                    {%else%}
+                                        <tr>
+                                            <td>{{object.course_id.name}}</td>
+                                            <td>{{object.class_id.date}}</td>
+                                            <td>{{object.class_id.time}}</td>
+                                            <td>{{object.t_id.name}}</td>
+                                        </tr>
+                                    {%endif%}
 
-                                            {%endfor%}
+                                    {%endfor%}
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+
                         <form  method="post">
                             {%csrf_token%}
                             <button class="btn btn-primary">Filter</button>
                             <div class="col-md-3 col-sm-4 col-xs-6 pull-right">
-
-                                <select class="form-control pull-right row b-none" name="date">
-                                    {%for class in attended_class%}
-                                    <option value="{{class.cl_id.date}}">{{class.cl_id.date|date:"Y-m-d"}}</option>
-                                    {%endfor%}
-                                </select>
-
-                                 <select class="form-control pull-right row b-none" name="course" >
-                                     {%for c in course%}
-                                    <option value="{{c.c.name}}">{{c.c.name}}</option>
+                                <h3>Course Filter</h3>
+                                 <select class="form-control pull-right row b-none" name="course_filter" >
+                                     {%for object in courses_enrolled%}
+                                    <option value="{{object.c.name}}">{{object.c.name}}</option>
                                      {%endfor%}
                                 </select>
                             </div>
-
                         </form>
+
                     </div>
                 </div>
                 <!-- /.row -->
