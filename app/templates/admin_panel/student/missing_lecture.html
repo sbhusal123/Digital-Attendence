@@ -19,6 +19,11 @@
                     <!-- /.col-lg-12 -->
                 </div>
                 <div class="row">
+                    {%if course_filter%}
+
+                        <h2>Currently filtering: <i>{{course_filter}}</i></h2>
+
+                    {%endif%}
                     <div class="col-md-12">
                         <div class="white-box">
                             <div class="table-responsive">
@@ -28,28 +33,30 @@
                                         <tr>
                                             <th>Course</th>
                                             <th>Date</th>
+                                            <th>Time</th>
                                             <th>Instructor</th>
                                         </tr>
                                     </thead>
-
                                     <tbody>
                                     {%for m in missing%}
-                                            {%if course_filter%}
-                                                {%if m.cl_id.course_id.name == course_filter%}
+                                        {%if course_filter%}
+                                            {%if m.course_id.name == course_filter%}
                                                 <tr>
-                                                    <td>{{m.cl_id.course_id.name}}</td>
-                                                    <td>{{m.cl_id.date}}</td>
-                                                    <td>{{m.cl_id.t_id.name}}</td>
-                                                </tr>
-                                                {%endif%}
-
-                                            {%else%}
-                                                <tr>
-                                                    <td>{{m.cl_id.course_id.name}}</td>
-                                                    <td>{{m.cl_id.date}}</td>
-                                                    <td>{{m.cl_id.t_id.name}}</td>
+                                                    <td>{{m.course_id.name}}</td>
+                                                    <td>{{m.class_id.date}}</td>
+                                                    <td>{{m.class_id.time}}</td>
+                                                    <td>{{m.t_id.name}}</td>
                                                 </tr>
                                             {%endif%}
+
+                                        {%else%}
+                                                <tr>
+                                                    <td>{{m.course_id.name}}</td>
+                                                    <td>{{m.class_id.date}}</td>
+                                                    <td>{{m.class_id.time}}</td>
+                                                    <td>{{m.t_id.name}}</td>
+                                                </tr>
+                                        {%endif%}
                                     {%endfor%}
                                     </tbody>
                                 </table>
@@ -57,9 +64,9 @@
                                     {%csrf_token%}
                                         <button class="btn btn-primary">Filter</button>
                                     <div class="col-md-3 col-sm-4 col-xs-6 pull-right">
-                                        <select class="form-control pull-right row b-none" name="course" >
-                                            {%for c in course%}
-                                            <option value="{{c.c.name}}">{{c.c.name}}</option>
+                                        <select class="form-control pull-right row b-none" name="course_filter" >
+                                            {%for c in enrolled_course%}
+                                            <option value="{{c.name}}">{{c.name}}</option>
                                             {%endfor%}
                                         </select>
 

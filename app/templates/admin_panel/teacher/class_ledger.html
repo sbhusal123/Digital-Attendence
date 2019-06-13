@@ -1,0 +1,72 @@
+{%extends 'admin_base.html'%}
+{% load static%}
+
+{%block content%}
+        {% include 'admin_panel/navigation_bar.html'%}
+        {% include 'admin_panel/teacher/side_navigation.html'%}
+        <!-- ============================================================== -->
+        <!-- Page Content -->
+        <!-- ============================================================== -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Classes Ledger</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                            <li class="active">Classes Ledger</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /row -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="white-box">
+                            <h3 class="box-title">Classes Ledger</h3>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Course</th>
+                                            <th>Department</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {%for class in class_taken_by_teacher%}
+                                        <tr>
+                                            <td>
+                                                <a href="{% url 'myapp:class_details' class.id %}">
+                                                    {{class.id}}
+                                                </a>
+                                            </td>
+
+                                            <td>{{class.course_id.name}}</td>
+                                            <td>{{class.dep_id.name}}</td>
+                                            <td>{{class.class_id.date}}</td>
+                                            <td>{{class.class_id.time}}</td>
+                                        </tr>
+                                    {%endfor%}
+                                    </tbody>
+                                </table><br>
+                            </div>
+                            <div class="alert alert-info" style="border: 2px solid indigo;border-radius: 5px">
+                                    <h3 align="center">Please click on the ID to view classes details.</h3>
+                                </div>
+                        </div>
+
+
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+
+        </div>
+        <!-- /#page-wrapper -->
+    </div>
+{%endblock%}

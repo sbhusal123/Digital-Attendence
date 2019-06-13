@@ -221,7 +221,9 @@ def broadcast_list(student_name): #for student
 
     student_id = Student.objects.get(username=student_name) #logged in student id
     student_dep_id = From.objects.get(s = student_id).d #student from deptid
+
     student_enrolled_course = Enroll.objects.filter(s = student_id) #student_enrolled courses
+
     enrolled_course_list = []
     for enroll in student_enrolled_course:
         enrolled_course_list.append(enroll.c.name)
@@ -236,7 +238,7 @@ def broadcast_list(student_name): #for student
 
     for b in active_associated:
         print(b.class_id.id)
-        if Attends.objects.filter(cl_id = b.class_id, std_id = student_id):
+        if Attends.objects.filter(cl_id = b.class_id, std_id = student_id).exists():
             pass
         else:
             return b
@@ -265,7 +267,16 @@ def broadcastStop(request,id):
 def teacher_ledger(request):
     if 'username' not in request.session or request.session["type"] != 'teacher':
         return redirect('/404Error')
-    return render(request, 'admin_panel/teacher/ledger.html')
+
+    t_username = request.session["username"]
+
+    class_taken_by_teacher = Associated.objects.filter(t_id__username = t_username)
+
+    context = {
+        "class_taken_by_teacher" : class_taken_by_teacher
+    }
+
+    return render(request, 'admin_panel/teacher/class_ledger.html',context)
 
 def student_ledger(request):
     if 'type' not in request.session or request.session['type'] != 'student':
@@ -410,14 +421,45 @@ def student_missingLectures(request):
     if 'type' not in request.session or request.session['type'] != "student":
         return redirect('/404Error')
 
-    course = Enroll.objects.filter(s__username__contains=request.session["username"])
-    missing = Attends.objects.filter(~Q(std_id__username__contains=request.session["username"]))
+    s_username = request.session["username"]
+
+    student_enrolled_object = Enroll.objects.filter(s__username = s_username)
+
+    student_enrolled_department = From.objects.get(s__username = s_username).d
+
+
+    student_enrolled_course = []
+
+    for enroll in student_enrolled_object:
+        student_enrolled_course.append(enroll.c)
+
+
+    # class_id which has no link in attends. Note:  unattended class record for all students
+    unattened_class = Class.objects.filter(~Q(attends__std_id__username=s_username))
+
+    # still filtering weather such class is associated with student's
+    # enrolled department and course
+
+    unattened_class_info = Associated.objects.filter(dep_id = student_enrolled_department,
+                                                     course_id__in = student_enrolled_course,
+                                                     class_id__in = unattened_class)
+
+
+    #at last must return associated objects
+
+
+    # context = {'missing': missing, 'course': course, 'course_filter': course_filter}
+
+    context = {
+        'missing' : unattened_class_info,
+        'enrolled_course' : student_enrolled_course
+    }
     if request.method == 'POST':
-        course_filter = request.POST["course"]
-        return render(request, 'admin_panel/student/blank.html',
-                        {'missing': missing, 'course': course, 'course_filter': course_filter})
+        course_filter = request.POST["course_filter"]
+        context["course_filter"] = course_filter
+        return render(request, 'admin_panel/student/missing_lecture.html',context)
     else:
-        return render(request, 'admin_panel/student/missing_lecture.html', {'missing': missing, 'course': course})
+        return render(request, 'admin_panel/student/missing_lecture.html',context)
 
 
 def teacher_missingLectures(request):
@@ -531,3 +573,44 @@ class CourseDetailView(DetailView):
     model = Course
     template_name = "admin_panel/department/course_detail.html"
     #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
+
+class ClassDetailView(ListView):
+    model = Attends
+    template_name = "admin_panel/teacher/class_details_view.html"
+    context_object_name = 'student_who_attended'
+
+    def get_context_data(self, *args, **kwargs):
+        class_id =  self.kwargs['class_id'] # this is how we get the url parameter passed
+        context = super(ClassDetailView, self).get_context_data(*args, **kwargs)
+
+        class_object = Class.objects.get(pk=class_id)
+        student_who_attended = Attends.objects.filter(cl_id=class_object)
+
+        class_associated_info = Associated.objects.get(class_id = class_object)
+
+        student_who_dint_attended = Student.objects.filter(~Q(attends__cl_id__pk = class_id),
+                                                           enroll__c=class_associated_info.course_id,
+                                                           from__d = class_associated_info.dep_id)
+
+
+
+
+
+
+
+        context["student_who_attended"] = student_who_attended
+
+        context["student_who_dint_attended"] = student_who_dint_attended
+
+
+
+
+        return context
+
+
+
+
+
+
+
+

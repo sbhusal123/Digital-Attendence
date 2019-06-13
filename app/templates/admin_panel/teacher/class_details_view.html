@@ -1,0 +1,83 @@
+{%extends 'admin_base.html'%}
+{% load static%}
+
+
+{%block content%}
+        {% include 'admin_panel/navigation_bar.html'%}
+        {% include 'admin_panel/teacher/side_navigation.html'%}
+
+
+
+<div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Class Details</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                        <ol class="breadcrumb">
+                            <li class="active">Class Details</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="white-box">
+                            <div class="alert alert-info" style="padding: 0px;border: 2px solid green; border-radius: 5px">
+                                <h3 align="center">Details Of the Class</h3>
+                            </div>
+                            <div class="table-responsive">
+                                <h2 align="center" style="color: indigo">Attended Students</h2>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Student Phone</th>
+                                            <th>Student Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {%for attends in student_who_attended %}
+
+                                        <tr>
+                                            <td>{{attends.std_id.name}}</td>
+                                            <td>{{attends.std_id.phone_no}}</td>
+                                            <td>{{attends.std_id.email}}</td>
+                                        </tr>
+                                    {%endfor%}
+                                    </tbody>
+                                </table><br>
+                            </div>
+
+                            <div class="table-responsive">
+                                <h2 align="center" style="color: indigo">Un-attended Students</h2>
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student Name</th>
+                                            <th>Student Phone</th>
+                                            <th>Student Email</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                    {%for student in student_who_dint_attended %}
+
+                                        <tr>
+                                            <td>{{student.name}}</td>
+                                            <td>{{student.phone_no}}</td>
+                                            <td>{{student.email}}</td>
+                                        </tr>
+                                    {%endfor%}
+                                    </tbody>
+                                </table><br>
+                            </div>
+                            <h2>{{id}}</h2>
+                    </div>
+                </div>
+            </div>
+            <!-- /.container-fluid -->
+        </div>
+
+{%endblock%}
