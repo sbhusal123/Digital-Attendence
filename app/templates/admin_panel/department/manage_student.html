@@ -81,6 +81,7 @@
                                             <td>{{student.s.email}}</td>
                                             <td>{{student.s.phone_no}}</td>
                                              <td>
+
                                              <form method="post" action="{%url 'myapp:remove_student'  student_id=student.s.id %} ">
                                                       {% csrf_token %}
                                                     <button type="submit" class="btn btn-danger btn-xs"> <span class="glyphicon glyphicon-trash"></span></button>

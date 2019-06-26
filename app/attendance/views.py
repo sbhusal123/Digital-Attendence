@@ -530,8 +530,16 @@ class ManageStudent(ListView):
 class TeacherListView(ListView): #Login required class list view
     context_object_name = 'teachers'
     model = Teacher
-    template_name = "admin_panel/department/teacher_list.html"
+    template_name = "admin_panel/department/manage_teachers.html"
 
+    def get_context_data(self, *args, **kwargs):
+        context = super(TeacherListView, self).get_context_data(*args, **kwargs)
+        logged_in_department_name = self.request.session["username"]
+        loged_in_dep_object = Department.objects.get(name=logged_in_department_name)
+        context['pending_teachers'] = Teacher.objects.filter(worksfor__d__isnull=True)
+        print(context["pending_teachers"].query)
+        context['approved_teachers'] = worksFor.objects.filter(d=loged_in_dep_object) # particular dep tupple
+        return context
 
 #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
@@ -541,7 +549,7 @@ class TeacherListView(ListView): #Login required class list view
 class TeacherDetailView(DetailView):
     context_object_name = 'teacher_detail'
     model = Teacher
-    template_name = "admin_panel/department/teacher_detail.html"
+    template_name = "admin_panel/department/manage_teachers.html"
     #     Security issue with the url. if url is directly provided acces is passed instead of foridding.
 
 
@@ -576,11 +584,12 @@ class CourseDetailView(DetailView):
 
 class ClassDetailView(ListView):
     model = Attends
+
     template_name = "admin_panel/teacher/class_details_view.html"
     context_object_name = 'student_who_attended'
 
     def get_context_data(self, *args, **kwargs):
-        class_id =  self.kwargs['class_id'] # this is how we get the url parameter passed
+        class_id =  self.kwargs['class_id']   # this is how we get the url parameter passed
         context = super(ClassDetailView, self).get_context_data(*args, **kwargs)
 
         class_object = Class.objects.get(pk=class_id)
@@ -592,25 +601,14 @@ class ClassDetailView(ListView):
                                                            enroll__c=class_associated_info.course_id,
                                                            from__d = class_associated_info.dep_id)
 
+        print("\n")
 
+        print(student_who_dint_attended.query)
 
-
-
-
+        print("\n")
 
         context["student_who_attended"] = student_who_attended
 
         context["student_who_dint_attended"] = student_who_dint_attended
 
-
-
-
         return context
-
-
-
-
-
-
-
-

@@ -1,0 +1,102 @@
+
+{%extends 'admin_base.html'%}
+{% load static%}
+{%block content%}
+        {% include 'admin_panel/navigation_bar.html'%}
+        {% include 'admin_panel/department/side_navigation.html'%}
+        <!-- ============================================================== -->
+        <!-- Page Content -->
+        <!-- ============================================================== -->
+        <div id="page-wrapper">
+            <div class="container-fluid">
+                <div class="row bg-title">
+                    <div class="col-lg-3 col-md-4 col-sm-4 col-xs-12">
+                        <h4 class="page-title">Basic List</h4> </div>
+                    <div class="col-lg-9 col-sm-8 col-md-8 col-xs-12">
+                        <ol class="breadcrumb">
+                            <li><a href="#">Dashboard</a></li>
+                            <li class="active">Basic List</li>
+                        </ol>
+                    </div>
+                    <!-- /.col-lg-12 -->
+                </div>
+                <!-- /row -->
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="white-box">
+                            <!--#ADDED teachers list using ListView:CBV-->
+
+                            <h2>Pending Teachers For Approval</h2>
+                            <div class="table-responsive" style="border: 2px solid teal;border-radius: 5px">
+                                <table class="table">
+                                        <thead>
+                                          <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone No</th>
+                                              <th>Approve</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                        {%for teachers in pending_teachers %}
+                                          <tr>
+
+                                            <td>{{teachers.name}}</td>
+                                            <td>{{teachers.email}}</td>
+                                            <td>{{teachers.phone_no}}</td>
+
+                                              <td>
+                                                  <form method="post" action="{%url 'myapp:approve_student'  student_id=teachers.id %} ">
+                                                      {% csrf_token %}
+                                                    <button type="submit" class="btn btn-primary btn-xs"> <span class="glyphicon glyphicon-ok"></span></button>
+                                                  </form>
+                                              </td>
+
+                                          </tr>
+                                        {%endfor%}
+                                        </tbody>
+                              </table>
+                            </div>
+                            <br>
+
+                            <h2>Approved Teachers</h2>
+                            <div class="table-responsive" style="border: 2px solid teal;border-radius: 5px">
+                                <table class="table">
+                                        <thead>
+                                          <tr>
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Phone No</th>
+                                              <th>Remove</th>
+                                          </tr>
+                                        </thead>
+                                        <tbody>
+                                          {%for teachers in approved_teachers%}
+                                         <tr>
+                                            <td>{{teachers.t.name}}</td> <!-- needed url to redirect to detail view-->
+                                            <td>{{teachers.t.email}}</td>
+                                            <td>{{teachers.t.phone_no}}</td>
+                                             <td>
+
+                                             <form method="post" action="{%url 'myapp:remove_student'  student_id=teachers.t.id %} ">
+                                                      {% csrf_token %}
+                                                    <button type="submit" class="btn btn-danger btn-xs"> <span class="glyphicon glyphicon-trash"></span></button>
+                                                  </form>
+
+                                              </td>
+                                          </tr>
+                                        {%endfor%}
+                                        </tbody>
+                              </table>
+
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+
+        <!-- /#page-wrapper -->
+{%endblock%}
