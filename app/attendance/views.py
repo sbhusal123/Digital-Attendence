@@ -601,6 +601,8 @@ class ClassDetailView(ListView):
                                                            enroll__c=class_associated_info.course_id,
                                                            from__d = class_associated_info.dep_id)
 
+        print(student_who_dint_attended.query)
+
         print("\n")
 
         print(student_who_dint_attended.query)
