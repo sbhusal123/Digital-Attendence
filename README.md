@@ -26,3 +26,23 @@
 5. Attendance Details in Teacher's Panel
 
 ![Class Details Of Teacher](https://github.com/sbhusal123/Digital-Attendence/blob/master/snapshoots/class%20details.png?raw=true)
+
+## Issues:
+### 1. Error on installing mysqlclient
+
+> pip install mysqlclient
+
+>Error: error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
+
+##### For python 3:
+sudo apt-get install python3 python-dev python3-dev \
+     build-essential libssl-dev libffi-dev \
+     libxml2-dev libxslt1-dev zlib1g-dev \
+     python-pip
+     
+##### For python 2:
+sudo apt-get install python-dev  \
+     build-essential libssl-dev libffi-dev \
+     libxml2-dev libxslt1-dev zlib1g-dev \
+     python-pip
+
