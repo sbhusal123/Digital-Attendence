@@ -53,7 +53,7 @@ To view the list of avilable time zone:
 Install **pytz**
 > pip install pytz
 
-```
-import pytz # $ pip install pytz
+``` python 
+import pytz 
 pytz.all_timezones_set
 ```
