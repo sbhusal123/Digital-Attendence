@@ -50,16 +50,13 @@ sudo apt-get install python-dev  \
 
 To view the list of avilable time zone:
 
-Install **pytz**
-> pip install pytz
+[Time Zone Database ](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). Then use one of the time zone in settings.py.
 
-
-``` python 
-import pytz 
-pytz.all_timezones_set
-```
-Then use one of the time zone in settings.py 
-
-```django
+```python
 TIME_ZONE = ".../..."
 ```
+For example:
+In case of Kathmandu
+```python
+TIME_ZONE = 'Asia/Kathmandu'
+'''
