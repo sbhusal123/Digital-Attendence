@@ -53,7 +53,13 @@ To view the list of avilable time zone:
 Install **pytz**
 > pip install pytz
 
+
 ``` python 
 import pytz 
 pytz.all_timezones_set
+```
+Then use one of the time zone in settings.py 
+
+```django
+TIME_ZONE = ".../..."
 ```
