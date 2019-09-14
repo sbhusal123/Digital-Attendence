@@ -59,4 +59,4 @@ For example:
 In case of Kathmandu
 ```python
 TIME_ZONE = 'Asia/Kathmandu'
-'''
+```
