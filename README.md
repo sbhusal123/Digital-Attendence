@@ -60,3 +60,22 @@ In case of Kathmandu
 ```python
 TIME_ZONE = 'Asia/Kathmandu'
 ```
+
+### 3. Optional Database COnnectivity And Configurations:
+Sometimes django needs to find **.cnf** file to configure the database which can be defined as:
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '<db_name>',
+        'USER' : '<username>',
+        'PASSWORD' : '<password>',
+        'HOST' : '<host>',
+        'PORT' : 'port',
+        'OPTIONS': {
+        'read_default_file': '/path/to/cnf/file', #/opt/lampp/etc/my.cnf in case of lampp
+        },
+    }
+}
+ ```
