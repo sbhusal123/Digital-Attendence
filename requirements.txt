@@ -3,7 +3,7 @@ attrs==18.1.0
 Babel==2.6.0
 certifi==2018.4.16
 chardet==3.0.4
-Django==2.1.5
+Django==2.2.10
 django-extensions==2.1.7
 django-phonenumber-field==2.1.0
 djangorestframework==3.10.0
